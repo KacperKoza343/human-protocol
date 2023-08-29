@@ -16,6 +16,7 @@ import {
   JobStatus,
   JobStatusFilter,
 } from '../../common/enums/job';
+import { EventType } from '../../common/enums/webhook';
 
 export class JobCreateDto {
   public chainId: ChainId;
@@ -82,6 +83,25 @@ export class JobCvatDto extends JobDto {
   public jobBounty: string;
 }
 
+export class EscrowFailedWebhookDto {
+  @ApiProperty({
+    enum: ChainId,
+  })
+  @IsEnum(ChainId)
+  public chainId: ChainId;
+
+  @ApiProperty()
+  @IsString()
+  public escrowAddress: string;
+
+  @ApiProperty()
+  @IsEnum(EventType)
+  public eventType: EventType;
+}
+
+
+
+
 export class JobUpdateDto {
   @ApiPropertyOptional({
     enum: JobStatus,
@@ -106,6 +126,7 @@ export class SaveManifestDto {
 export class SendWebhookDto {
   public escrowAddress: string;
   public chainId: number;
+  public eventType: EventType;
 }
 
 export class FortuneManifestDto {

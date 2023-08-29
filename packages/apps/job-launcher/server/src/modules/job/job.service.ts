@@ -56,6 +56,7 @@ import { Web3Service } from '../web3/web3.service';
 import {
   CvatFinalResultDto,
   CvatManifestDto,
+  EscrowFailedWebhookDto,
   FortuneFinalResultDto,
   FortuneManifestDto,
   JobCvatDto,
@@ -67,6 +68,7 @@ import {
 import { JobEntity } from './job.entity';
 import { JobRepository } from './job.repository';
 import { RoutingProtocolService } from './routing-protocol.service';
+import { EventType } from '../../common/enums/webhook';
 
 @Injectable()
 export class JobService {
@@ -271,6 +273,7 @@ export class JobService {
         {
           escrowAddress: jobEntity.escrowAddress,
           chainId: jobEntity.chainId,
+          eventType: EventType.ESCROW_CREATED
         },
       );
     }
@@ -440,5 +443,27 @@ export class JobService {
     }
 
     return result;
+  }
+
+  public async escrowFailedWebhook(dto: EscrowFailedWebhookDto): Promise<boolean> {
+    if (dto.eventType !== EventType.ESCROW_CANCELED) {
+      this.logger.log(ErrorJob.InvalidEventType, JobService.name);
+      throw new NotFoundException(ErrorJob.InvalidEventType);
+    }
+
+    const jobEntity = await this.jobRepository.findOne({
+      chainId: dto.chainId,
+      escrowAddress: dto.escrowAddress
+    });
+
+    if (!jobEntity) {
+      this.logger.log(ErrorJob.NotFound, JobService.name);
+      throw new NotFoundException(ErrorJob.NotFound);
+    }
+
+    jobEntity.status = JobStatus.FAILED
+    await jobEntity.save()
+
+    return true;
   }
 }

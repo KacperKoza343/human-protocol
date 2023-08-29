@@ -12,6 +12,7 @@ export enum ErrorJob {
   ResultValidationFailed = 'Result validation failed',
   InvalidRequestType = 'Invalid job type',
   JobParamsValidationFailed = 'Job parameters validation failed',
+  InvalidEventType = 'Invalid event type',
 }
 
 /**
