@@ -10,7 +10,6 @@ import {
   IsOptional,
   IsObject,
   IsNumberString,
-  ArrayNotEmpty, 
   Min, 
   Max, 
   IsNotEmpty, 
@@ -75,6 +74,7 @@ export class JobCvatDto extends JobDto {
   @ApiProperty()
   @IsNumber()
   @IsPositive()
+  @Max(100)
   public minQuality: number;
 
   @ApiProperty()

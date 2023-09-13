@@ -167,7 +167,7 @@ export class JobService {
           ),
         },
         validation: {
-          min_quality: dto.minQuality,
+          min_quality: dto.minQuality / 100,
           val_size: Number(
             this.configService.get<number>(ConfigNames.CVAT_VAL_SIZE)!,
           ),
