@@ -9,7 +9,8 @@ import {
   IsDate,
   IsOptional,
   IsObject,
-  IsNumberString
+  IsNumberString, 
+  IsNotEmpty,
 } from 'class-validator';
 import { ChainId } from '@human-protocol/sdk';
 import {
@@ -17,7 +18,9 @@ import {
   JobStatus,
   JobStatusFilter,
 } from '../../common/enums/job';
+import {Exchange} from '../../common/enums/exchange';
 import { EventType, OracleType } from '../../common/enums/webhook';
+
 
 export class JobCreateDto {
   public chainId: ChainId;
@@ -46,6 +49,45 @@ export class JobDto {
   @IsNumber()
   @IsPositive()
   public fundAmount: number;
+}
+
+export class JobCampaignDto extends JobDto {
+  @ApiProperty()
+  @IsNumber()
+  @IsPositive()
+  public startBlock: number;
+
+  @ApiProperty()
+  @IsNumber()
+  @IsPositive()
+  public endBlock: number;
+
+  @ApiProperty()
+  @IsString()
+  @IsEnum(Exchange)
+  public exchangeName: Exchange;
+
+  @ApiProperty()
+  @IsString()
+  public tokenA: string;
+
+  @ApiProperty()
+  @IsString()
+  public tokenB: string;
+
+  @ApiProperty()
+  @IsNumber()
+  @IsPositive()
+  public campaignDuration: number;
+
+  @ApiProperty()
+  @IsNumber()
+  @IsPositive()
+  public fundAmount: number;
+
+  @ApiProperty()
+  @IsEnum(JobRequestType)
+  type: JobRequestType;
 }
 
 export class JobFortuneDto extends JobDto {
@@ -133,6 +175,38 @@ export class FortuneManifestDto {
   requestType: JobRequestType;
 }
 
+export class CampaignManifestDto {
+  @IsNumber()
+  @IsPositive()
+  startBlock: number;
+  @IsNumber()
+  @IsPositive()
+  endBlock: number;
+
+  @IsString()
+  @IsEnum(Exchange)
+  exchangeName: Exchange;
+
+  @IsString()
+  tokenA: string;
+  @IsString()
+  tokenB: string;
+
+  @IsNumber()
+  @IsPositive()
+  campaignDuration: number;
+
+  @IsNumber()
+  @IsPositive()
+  fundAmount: number;
+
+  @IsString()
+  requesterDescription: string; // address of launcher
+
+  @IsEnum(JobRequestType)
+  requestType: JobRequestType;
+}
+
 export class CvatData {
   @IsString()
   data_url: string;
@@ -198,6 +272,17 @@ export class FortuneFinalResultDto {
 
   @IsString()
   solution: string;
+}
+
+export class CampaignFinalResultDto {
+  @IsString()
+  exchangeAddress: string;
+
+  @IsString()
+  workerIdentifier: string; // worker address for DEX or read only API key encrypted for CEX
+
+  @IsString()
+  liquidityScore: string;
 }
 
 export class CvatFinalResultDto {

@@ -14,7 +14,7 @@ import {
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard, SignatureAuthGuard } from '../../common/guards';
 import { RequestWithUser } from '../../common/types';
-import { JobFortuneDto, JobCvatDto, JobListDto, JobCancelDto, EscrowFailedWebhookDto } from './job.dto';
+import { JobFortuneDto, JobCvatDto, JobListDto, JobCancelDto, EscrowFailedWebhookDto, JobCampaignDto } from './job.dto';
 import { JobService } from './job.service';
 import { JobRequestType, JobStatusFilter } from '../../common/enums/job';
 import { Public } from '../../common/decorators';
@@ -42,6 +42,15 @@ export class JobController {
   ): Promise<number> {
     return this.jobService.createJob(req.user.id, data.type, data);
   }
+
+  @Post('/campaign')
+  public async createCampaignJob(
+    @Request() req: RequestWithUser,
+    @Body() data: JobCampaignDto,
+  ): Promise<number> {
+    return this.jobService.createJob(req.user.id, JobRequestType.CAMPAIGN, data);
+  }
+  
 
   @Get('/list')
   @ApiQuery({ name: 'status', required: false, enum: JobStatusFilter })

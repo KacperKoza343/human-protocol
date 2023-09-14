@@ -21,4 +21,5 @@ export enum JobRequestType {
   IMAGE_POINTS = 'IMAGE_POINTS',
   IMAGE_BOXES = 'IMAGE_BOXES',
   FORTUNE = 'FORTUNE',
+  CAMPAIGN = 'CAMPAIGN',
 }

@@ -61,6 +61,9 @@ import {
   JobListDto,
   SaveManifestDto,
   SendWebhookDto,
+  CampaignFinalResultDto,
+  CampaignManifestDto,
+  JobCampaignDto,
 } from './job.dto';
 import { JobEntity } from './job.entity';
 import { JobRepository } from './job.repository';
@@ -110,7 +113,7 @@ export class JobService {
   public async createJob(
     userId: number,
     requestType: JobRequestType,
-    dto: JobFortuneDto | JobCvatDto,
+    dto: JobFortuneDto | JobCvatDto | JobCampaignDto,
   ): Promise<number> {
     let manifestUrl, manifestHash;
     const { chainId, fundAmount } = dto;
@@ -144,7 +147,17 @@ export class JobService {
         requestType,
         fundAmount: tokenFundAmount,
       }));
-    } else {
+    } 
+    else if (requestType == JobRequestType.CAMPAIGN) {
+      ({ manifestUrl, manifestHash } = await this.saveManifest({
+        ...(dto as JobCampaignDto),
+
+        requestType,
+        fundAmount: tokenFundAmount,
+      }));
+    }
+    
+    else {
       dto = dto as JobCvatDto;
       ({ manifestUrl, manifestHash } = await this.saveManifest({
         data: {
@@ -320,7 +333,7 @@ export class JobService {
   }
 
   public async saveManifest(
-    manifest: FortuneManifestDto | CvatManifestDto,
+    manifest: FortuneManifestDto | CvatManifestDto | CampaignManifestDto,
   ): Promise<SaveManifestDto> {
     const uploadedFiles: UploadFile[] = await this.storageClient.uploadFiles(
       [manifest],
@@ -339,12 +352,17 @@ export class JobService {
   }
 
   private async validateManifest(
-    manifest: FortuneManifestDto | CvatManifestDto,
+    manifest: FortuneManifestDto | CvatManifestDto | CampaignManifestDto,
   ): Promise<boolean> {
-    const dtoCheck =
-      (manifest as FortuneManifestDto).requestType == JobRequestType.FORTUNE
-        ? new FortuneManifestDto()
-        : new CvatManifestDto();
+    let dtoCheck;
+
+    if ((manifest as FortuneManifestDto).requestType == JobRequestType.FORTUNE) {
+        dtoCheck = new FortuneManifestDto();
+    } else if ((manifest as CampaignManifestDto).requestType == JobRequestType.CAMPAIGN) {
+        dtoCheck = new CampaignManifestDto();
+    } else {
+        dtoCheck = new CvatManifestDto();
+    }
 
     Object.assign(dtoCheck, manifest);
 
@@ -363,7 +381,7 @@ export class JobService {
 
   public async getManifest(
     manifestUrl: string,
-  ): Promise<FortuneManifestDto | CvatManifestDto> {
+  ): Promise<FortuneManifestDto | CvatManifestDto | CampaignManifestDto> {
     const manifest = await StorageClient.downloadFileFromUrl(manifestUrl);
 
     if (!manifest) {
@@ -426,7 +444,7 @@ export class JobService {
   public async getResult(
     userId: number,
     jobId: number,
-  ): Promise<FortuneFinalResultDto | CvatFinalResultDto> {
+  ): Promise<FortuneFinalResultDto | CvatFinalResultDto | CampaignFinalResultDto> {
     const jobEntity = await this.jobRepository.findOne({
       id: jobId,
       userId,
@@ -456,32 +474,35 @@ export class JobService {
     }
 
     const fortuneDtoCheck = new FortuneFinalResultDto();
-    const imageLabelBinaryDtoCheck = new CvatFinalResultDto();
+  const imageLabelBinaryDtoCheck = new CvatFinalResultDto();
+  const campaignDtoCheck = new CampaignFinalResultDto();
 
-    Object.assign(fortuneDtoCheck, result);
-    Object.assign(imageLabelBinaryDtoCheck, result);
+  Object.assign(fortuneDtoCheck, result);
+  Object.assign(imageLabelBinaryDtoCheck, result);
+  Object.assign(campaignDtoCheck, result);
 
-    const fortuneValidationErrors: ValidationError[] = await validate(
-      fortuneDtoCheck,
+  const fortuneValidationErrors: ValidationError[] = await validate(fortuneDtoCheck);
+  const imageLabelBinaryValidationErrors: ValidationError[] = await validate(imageLabelBinaryDtoCheck);
+  const campaignValidationErrors: ValidationError[] = await validate(campaignDtoCheck);
+
+  if (
+    fortuneValidationErrors.length > 0 &&
+    imageLabelBinaryValidationErrors.length > 0 &&
+    campaignValidationErrors.length > 0
+  ) {
+    this.logger.log(
+      ErrorJob.ResultValidationFailed,
+      JobService.name,
+      fortuneValidationErrors,
+      imageLabelBinaryValidationErrors,
+      campaignValidationErrors
     );
-    const imageLabelBinaryValidationErrors: ValidationError[] = await validate(
-      imageLabelBinaryDtoCheck,
-    );
-    if (
-      fortuneValidationErrors.length > 0 &&
-      imageLabelBinaryValidationErrors.length > 0
-    ) {
-      this.logger.log(
-        ErrorJob.ResultValidationFailed,
-        JobService.name,
-        fortuneValidationErrors,
-        imageLabelBinaryValidationErrors,
-      );
-      throw new NotFoundException(ErrorJob.ResultValidationFailed);
-    }
-
-    return result;
+    throw new NotFoundException(ErrorJob.ResultValidationFailed);
   }
+
+  return result;
+}
+
 
   public async launchCronJob() {
     try {
@@ -587,7 +608,22 @@ export class JobService {
             eventType: EventType.ESCROW_CANCELED,
           },
         );
-      } else {
+      } else if (
+        (manifest as CampaignManifestDto).requestType === JobRequestType.CAMPAIGN
+      ) {
+        await this.sendWebhook(
+          this.configService.get<string>(
+            ConfigNames.CAMPAIGN_EXCHANGE_ORACLE_WEBHOOK_URL,
+          )!,
+          {
+            escrowAddress,
+            chainId: jobEntity.chainId,
+            eventType: EventType.ESCROW_CANCELED,
+          },
+        );
+
+      }
+      else {
         await this.sendWebhook(
           this.configService.get<string>(
             ConfigNames.CVAT_EXCHANGE_ORACLE_WEBHOOK_URL,
