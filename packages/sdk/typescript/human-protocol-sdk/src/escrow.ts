@@ -49,7 +49,7 @@ export class EscrowClient {
   public network: NetworkData;
 
   /**
-   * **EscrowClient constructor**
+   * EscrowClient constructor
    *
    * @param {Signer | Provider} signerOrProvider - The Signer or Provider object to interact with the Ethereum network
    * @param {NetworkData} network - The network information required to connect to the Escrow contract
@@ -67,9 +67,9 @@ export class EscrowClient {
    * Creates an instance of EscrowClient from a Signer or Provider.
    *
    * @param {Signer | Provider} signerOrProvider - The Signer or Provider object to interact with the Ethereum network
-   * @returns {Promise<EscrowClient>} - An instance of EscrowClient
-   * @throws {ErrorProviderDoesNotExist} - Thrown if the provider does not exist for the provided Signer
-   * @throws {ErrorUnsupportedChainID} - Thrown if the network's chainId is not supported
+   * @returns {Promise<EscrowClient>} An instance of EscrowClient
+   * @throws {ErrorProviderDoesNotExist} Thrown if the provider does not exist for the provided Signer
+   * @throws {ErrorUnsupportedChainID} Thrown if the network's chainId is not supported
    */
   public static async build(signerOrProvider: Signer | Provider) {
     let network: Network;
@@ -98,8 +98,8 @@ export class EscrowClient {
    *
    * @param {string} tokenAddress - Token address to use for pay outs.
    * @param {string[]} trustedHandlers - Array of addresses that can perform actions on the contract.
-   * @returns {Promise<string>} - Return the address of the escrow created.
-   * @throws {Error} - An error object if an error occurred.
+   * @returns {Promise<string>} Return the address of the escrow created.
+   * @throws {Error} An error object if an error occurred.
    */
   @requiresSigner
   public async createEscrow(
@@ -145,8 +145,7 @@ export class EscrowClient {
    *
    * @param {string} escrowAddress - Address of the escrow to set up.
    * @param {IEscrowConfig} escrowConfig - Configuration object with escrow settings.
-   * @returns {Promise<void>}
-   * @throws {Error} - An error object if an error occurred.
+   * @throws {Error} An error object if an error occurred.
    */
   @requiresSigner
   async setup(
@@ -233,14 +232,14 @@ export class EscrowClient {
   }
 
   /**
-   * **Creates an escrow contract that uses the token passed to pay oracle fees and reward workers.*
-   * **Sets up the parameters of the escrow.*
+   * Creates an escrow contract that uses the token passed to pay oracle fees and reward workers.
+   * Sets up the parameters of the escrow.
    *
    * @param {string} tokenAddress - Token address to use for pay outs.
    * @param {string[]} trustedHandlers - Array of addresses that can perform actions on the contract.
    * @param {IEscrowConfig} escrowConfig - Configuration object with escrow settings.
-   * @returns {Promise<string>}
-   * @throws {Error} - An error object if an error occurred.
+   * @returns {Promise<string>} Return the address of the escrow created.
+   * @throws {Error} An error object if an error occurred.
    */
   @requiresSigner
   async createAndSetupEscrow(
@@ -265,12 +264,11 @@ export class EscrowClient {
   }
 
   /**
-   * **Adds funds of the chosen token to the escrow.*
+   * Adds funds of the chosen token to the escrow.
    *
    * @param {string} escrowAddress - Address of the escrow to fund.
    * @param {BigNumber} amount - Amount to be added as funds.
-   * @returns {Promise<void>}
-   * @throws {Error} - An error object if an error occurred.
+   * @throws {Error} An error object if an error occurred.
    */
   @requiresSigner
   async fund(escrowAddress: string, amount: BigNumber): Promise<void> {
@@ -308,14 +306,13 @@ export class EscrowClient {
   }
 
   /**
-   * **Stores the results.*
+   * Stores the results.
    *
    * @param {string} escrowAddress - Address of the escrow.
    * @param {string} sender - Address of the sender.
    * @param {string} url - Results file url.
    * @param {string} hash - Results file hash.
-   * @returns {Promise<void>}
-   * @throws {Error} - An error object if an error occurred.
+   * @throws {Error} An error object if an error occurred.
    */
   @requiresSigner
   async storeResults(
@@ -357,11 +354,10 @@ export class EscrowClient {
   }
 
   /**
-   * **Sets the status of an escrow to completed.*
+   * Sets the status of an escrow to completed.
    *
    * @param {string} escrowAddress - Address of the escrow.
-   * @returns {Promise<void>}
-   * @throws {Error} - An error object if an error occurred.
+   * @throws {Error} An error object if an error occurred.
    */
   @requiresSigner
   async complete(escrowAddress: string): Promise<void> {
@@ -393,8 +389,7 @@ export class EscrowClient {
    * @param {BigNumber[]} amounts - Array of amounts the recipients will receive.
    * @param {string} finalResultsUrl - Final results file url.
    * @param {string} finalResultsHash - Final results file hash.
-   * @returns {Promise<void>}
-   * @throws {Error} - An error object if an error occurred.
+   * @throws {Error} An error object if an error occurred.
    */
   @requiresSigner
   async bulkPayOut(
@@ -476,8 +471,7 @@ export class EscrowClient {
    * Cancels the specified escrow and sends the balance to the canceler.
    *
    * @param {string} escrowAddress - Address of the escrow.
-   * @returns {Promise<void>}
-   * @throws {Error} - An error object if an error occurred.
+   * @throws {Error} An error object if an error occurred.
    */
   @requiresSigner
   async cancel(escrowAddress: string): Promise<void> {
@@ -502,11 +496,10 @@ export class EscrowClient {
   }
 
   /**
-   * Cancels the specified escrow, sends the balance to the canceler and selfdestructs the escrow contract.
+   * Cancels the specified escrow, sends the balance to the canceler and self-destructs the escrow contract.
    *
    * @param {string} escrowAddress - Address of the escrow.
-   * @returns {Promise<void>}
-   * @throws {Error} - An error object if an error occurred.
+   * @throws {Error} An error object if an error occurred.
    */
   @requiresSigner
   async abort(escrowAddress: string): Promise<void> {
@@ -535,8 +528,7 @@ export class EscrowClient {
    *
    * @param {string} escrowAddress - Address of the escrow.
    * @param {string[]} trustedHandlers - List of trusted handler addresses.
-   * @returns {Promise<void>}
-   * @throws {Error} - An error object if an error occurred.
+   * @throws {Error} An error object if an error occurred.
    */
   @requiresSigner
   async addTrustedHandlers(
@@ -577,8 +569,8 @@ export class EscrowClient {
    * Returns the balance for a specified escrow address.
    *
    * @param {string} escrowAddress - Address of the escrow.
-   * @returns {Promise<BigNumber>}
-   * @throws {Error} - An error object if an error occurred.
+   * @returns {Promise<BigNumber>} Escrow balance.
+   * @throws {Error} An error object if an error occurred.
    */
   async getBalance(escrowAddress: string): Promise<BigNumber> {
     if (!ethers.utils.isAddress(escrowAddress)) {
@@ -604,8 +596,8 @@ export class EscrowClient {
    * Returns the manifest file hash.
    *
    * @param {string} escrowAddress - Address of the escrow.
-   * @returns {Promise<void>}
-   * @throws {Error} - An error object if an error occurred.
+   * @returns {Promise<string>} Manifest file hash.
+   * @throws {Error} An error object if an error occurred.
    */
   async getManifestHash(escrowAddress: string): Promise<string> {
     if (!ethers.utils.isAddress(escrowAddress)) {
@@ -631,8 +623,8 @@ export class EscrowClient {
    * Returns the manifest file URL.
    *
    * @param {string} escrowAddress - Address of the escrow.
-   * @returns {Promise<void>}
-   * @throws {Error} - An error object if an error occurred.
+   * @returns {Promise<string>} Manifest file URL.
+   * @throws {Error} An error object if an error occurred.
    */
   async getManifestUrl(escrowAddress: string): Promise<string> {
     if (!ethers.utils.isAddress(escrowAddress)) {
@@ -658,8 +650,8 @@ export class EscrowClient {
    * Returns the results file URL.
    *
    * @param {string} escrowAddress - Address of the escrow.
-   * @returns {Promise<void>}
-   * @throws {Error} - An error object if an error occurred.
+   * @returns {Promise<void>} Results file URL.
+   * @throws {Error} An error object if an error occurred.
    */
   async getResultsUrl(escrowAddress: string): Promise<string> {
     if (!ethers.utils.isAddress(escrowAddress)) {
@@ -685,8 +677,8 @@ export class EscrowClient {
    * Returns the intermediate results file URL.
    *
    * @param {string} escrowAddress - Address of the escrow.
-   * @returns {Promise<void>}
-   * @throws {Error} - An error object if an error occurred.
+   * @returns {Promise<string>} Intermediate results file URL.
+   * @throws {Error} An error object if an error occurred.
    */
   async getIntermediateResultsUrl(escrowAddress: string): Promise<string> {
     if (!ethers.utils.isAddress(escrowAddress)) {
@@ -709,11 +701,11 @@ export class EscrowClient {
   }
 
   /**
-   * Returns the value for a specified key and address
+   * Returns the token address of given escrow
    *
    * @param {string} escrowAddress - Address of the escrow.
-   * @returns {Promise<void>}
-   * @throws {Error} - An error object if an error occurred.
+   * @returns {Promise<string>} Address of the token.
+   * @throws {Error} An error object if an error occurred.
    */
   async getTokenAddress(escrowAddress: string): Promise<string> {
     if (!ethers.utils.isAddress(escrowAddress)) {
@@ -739,8 +731,8 @@ export class EscrowClient {
    * Returns the current status of the escrow.
    *
    * @param {string} escrowAddress - Address of the escrow.
-   * @returns {Promise<void>}
-   * @throws {Error} - An error object if an error occurred.
+   * @returns {Promise<EscrowStatus>} Current status of the escrow.
+   * @throws {Error} An error object if an error occurred.
    */
   async getStatus(escrowAddress: string): Promise<EscrowStatus> {
     if (!ethers.utils.isAddress(escrowAddress)) {
@@ -766,8 +758,8 @@ export class EscrowClient {
    * Returns the list of escrows for given filter
    *
    * @param {IEscrowsFilter} filter - Filter parameters.
-   * @returns {Promise<EscrowData[]>}
-   * @throws {Error} - An error object if an error occurred.
+   * @returns {Promise<EscrowData[]>} List of escrows.
+   * @throws {Error} An error object if an error occurred.
    */
   async getEscrows(filter: IEscrowsFilter = {}): Promise<EscrowData[]> {
     if (filter.launcher && !ethers.utils.isAddress(filter.launcher)) {
@@ -821,8 +813,8 @@ export class EscrowClient {
    * Returns the recording oracle address of given escrow
    *
    * @param {string} escrowAddress - Address of the escrow.
-   * @returns {Promise<string>} - Address of the recording oracle.
-   * @throws {Error} - An error object if an error occurred.
+   * @returns {Promise<string>} Address of the recording oracle.
+   * @throws {Error} An error object if an error occurred.
    */
   async getRecordingOracleAddress(escrowAddress: string): Promise<string> {
     if (!ethers.utils.isAddress(escrowAddress)) {
@@ -848,8 +840,8 @@ export class EscrowClient {
    * Returns the job launcher address of given escrow
    *
    * @param {string} escrowAddress - Address of the escrow.
-   * @returns {Promise<string>} - Address of the job launcher.
-   * @throws {Error} - An error object if an error occurred.
+   * @returns {Promise<string>} Address of the job launcher.
+   * @throws {Error} An error object if an error occurred.
    */
   async getJobLauncherAddress(escrowAddress: string): Promise<string> {
     if (!ethers.utils.isAddress(escrowAddress)) {
@@ -875,8 +867,8 @@ export class EscrowClient {
    * Returns the reputation oracle address of given escrow
    *
    * @param {string} escrowAddress - Address of the escrow.
-   * @returns {Promise<string>} - Address of the reputation oracle.
-   * @throws {Error} - An error object if an error occurred.
+   * @returns {Promise<string>} Address of the reputation oracle.
+   * @throws {Error} An error object if an error occurred.
    */
   async getReputationOracleAddress(escrowAddress: string): Promise<string> {
     if (!ethers.utils.isAddress(escrowAddress)) {
@@ -902,8 +894,8 @@ export class EscrowClient {
    * Returns the reputation oracle address of given escrow
    *
    * @param {string} escrowAddress - Address of the escrow.
-   * @returns {Promise<string>} - Address of the reputation oracle.
-   * @throws {Error} - An error object if an error occurred.
+   * @returns {Promise<string>} Address of the reputation oracle.
+   * @throws {Error} An error object if an error occurred.
    */
   async getExchangeOracleAddress(escrowAddress: string): Promise<string> {
     if (!ethers.utils.isAddress(escrowAddress)) {
@@ -929,8 +921,8 @@ export class EscrowClient {
    * Returns the escrow factory address of given escrow
    *
    * @param {string} escrowAddress - Address of the escrow.
-   * @returns {Promise<string>} - Address of the escrow factory.
-   * @throws {Error} - An error object if an error occurred.
+   * @returns {Promise<string>} Address of the escrow factory.
+   * @throws {Error} An error object if an error occurred.
    */
   async getFactoryAddress(escrowAddress: string): Promise<string> {
     if (!ethers.utils.isAddress(escrowAddress)) {

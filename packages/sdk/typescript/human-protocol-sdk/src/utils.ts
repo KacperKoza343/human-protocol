@@ -17,7 +17,7 @@ import {
  * **Get specific error text.*
  *
  * @param {any} error - An error message.
- * @returns
+ * @returns {string} - The error message.
  */
 export const getRevertReason = (error: any): string => {
   const prefix = "reverted with reason string '";
@@ -32,7 +32,7 @@ export const getRevertReason = (error: any): string => {
  * **Handle and throw the error.*
  *
  * @param {any} e
- * @returns
+ * @returns {void}
  */
 export const throwError = (e: any) => {
   if (e.code === ethers.utils.Logger.errors.INVALID_ARGUMENT) {
@@ -61,7 +61,7 @@ export const throwError = (e: any) => {
  * **URL validation.*
  *
  * @param {string} url
- * @returns
+ * @returns {boolean}
  */
 export const isValidUrl = (url: string) => {
   try {

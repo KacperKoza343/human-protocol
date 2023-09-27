@@ -1,0 +1,21 @@
+version: 2
+
+build:
+  os: "ubuntu-20.04"
+  tools:
+    python: "3.10"
+    nodejs: "18"
+  jobs:
+    post_install:
+      - npm install -g jsdoc
+      - npm install -g yarn
+      - yarn install
+      - yarn workspace @human-protocol/sdk build
+
+
+sphinx:
+  configuration: packages/sdk/typescript/human-protocol-sdk/docs/conf.py
+
+python:
+  install:
+    - requirements: packages/sdk/typescript/human-protocol-sdk/docs/requirements.txt

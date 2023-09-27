@@ -4,29 +4,11 @@
  * @enum {number}
  */
 export enum EscrowStatus {
-  /**
-   * Escrow is launched.
-   */
   Launched,
-  /**
-   * Escrow is funded, and waiting for the results to be submitted.
-   */
   Pending,
-  /**
-   * Escrow is partially paid out.
-   */
   Partial,
-  /**
-   * Escrow is fully paid.
-   */
   Paid,
-  /**
-   * Escrow is finished..
-   */
   Complete,
-  /**
-   * Escrow is cancelled.
-   */
   Cancelled,
 }
 
