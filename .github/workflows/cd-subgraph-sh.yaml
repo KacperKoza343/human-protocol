@@ -31,7 +31,7 @@ jobs:
   trigger-build-and-deploy:
     if: always() && github.repository_owner == 'humanprotocol' && (needs.pull-request-check.result == 'skipped' || needs.pull-request-check.result == 'success')
     needs: pull-request-check
-    name: Trigger build and deploy image
+    name: Trigger deploy subgraph
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -42,7 +42,7 @@ jobs:
         owner: humanprotocol
         repo: multi-repo-cicd
         github_token: ${{ secrets.GH_TOKEN }}
-        workflow_file_name: docker_build_and_deploy.yml
+        workflow_file_name: deploy_subgraph.yml
         ref: subgraph
         wait_interval: 15
         client_payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}", "repository": "${{ github.repository }}", "trigger": "${{  github.event_name }}", "app": "subgraph"}'
