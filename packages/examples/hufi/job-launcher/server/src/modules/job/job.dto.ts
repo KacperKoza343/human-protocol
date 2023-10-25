@@ -1,0 +1,328 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsArray,
+  IsEnum,
+  IsNumber,
+  IsPositive,
+  IsString,
+  IsUrl,
+  IsDate,
+  IsOptional,
+  IsObject,
+  IsNumberString, 
+  IsNotEmpty,
+} from 'class-validator';
+import { ChainId } from '@human-protocol/sdk';
+import {
+  JobRequestType,
+  JobStatus,
+  JobStatusFilter,
+} from '../../common/enums/job';
+import {Exchange} from '../../common/enums/exchange';
+import { EventType, OracleType } from '../../common/enums/webhook';
+
+
+export class JobCreateDto {
+  public chainId: ChainId;
+  public userId: number;
+  public manifestUrl: string;
+  public manifestHash: string;
+  public fee: number;
+  public fundAmount: number;
+  public status: JobStatus;
+  public waitUntil: Date;
+}
+
+export class JobDto {
+  @ApiProperty({
+    enum: ChainId,
+  })
+  @IsEnum(ChainId)
+  @IsOptional()
+  public chainId?: ChainId;
+
+  @ApiProperty()
+  @IsString()
+  public requesterDescription: string;
+
+  @ApiProperty()
+  @IsNumber()
+  @IsPositive()
+  public fundAmount: number;
+}
+
+export class JobCampaignDto extends JobDto {
+  @ApiProperty()
+  @IsNumber()
+  @IsPositive()
+  public startBlock: number;
+
+  @ApiProperty()
+  @IsNumber()
+  @IsPositive()
+  public endBlock: number;
+
+  @ApiProperty()
+  @IsString()
+  @IsEnum(Exchange)
+  public exchangeName: Exchange;
+
+  @ApiProperty()
+  @IsString()
+  public tokenA: string;
+
+  @ApiProperty()
+  @IsString()
+  public tokenB: string;
+
+  @ApiProperty()
+  @IsNumber()
+  @IsPositive()
+  public campaignDuration: number;
+
+  @ApiProperty()
+  @IsNumber()
+  @IsPositive()
+  public fundAmount: number;
+
+  @ApiProperty()
+  @IsEnum(JobRequestType)
+  type: JobRequestType;
+}
+
+export class JobFortuneDto extends JobDto {
+  @ApiProperty()
+  @IsString()
+  public requesterTitle: string;
+
+  @ApiProperty()
+  @IsNumber()
+  public submissionsRequired: number;
+}
+
+export class JobCvatDto extends JobDto {
+  @ApiProperty()
+  @IsUrl()
+  public dataUrl: string;
+
+  @ApiProperty()
+  @IsArray()
+  public labels: string[];
+
+  @ApiProperty()
+  @IsNumber()
+  @IsPositive()
+  public minQuality: number;
+
+  @ApiProperty()
+  @IsString()
+  public gtUrl: string;
+
+  @ApiProperty()
+  @IsEnum(JobRequestType)
+  type: JobRequestType;
+}
+
+export class JobCancelDto {
+  @ApiProperty()
+  @IsNumberString()
+  public id: number;
+}
+
+export class JobUpdateDto {
+  @ApiPropertyOptional({
+    enum: JobStatus,
+  })
+  @IsEnum(JobStatus)
+  public status: JobStatus;
+}
+
+export class JobUpdateDataDto extends JobUpdateDto {
+  @IsNumber()
+  public retriesCount: number;
+
+  @IsDate()
+  public waitUntil: Date;
+}
+
+export class SaveManifestDto {
+  public manifestUrl: string;
+  public manifestHash: string;
+}
+
+export class SendWebhookDto {
+  public escrowAddress: string;
+  public chainId: number;
+  public eventType: EventType;
+}
+
+export class FortuneManifestDto {
+  @IsNumber()
+  @IsPositive()
+  submissionsRequired: number;
+
+  @IsString()
+  requesterTitle: string;
+
+  @IsString()
+  requesterDescription: string;
+
+  @IsNumber()
+  @IsPositive()
+  fundAmount: number;
+
+  @IsEnum(JobRequestType)
+  requestType: JobRequestType;
+}
+
+export class CampaignManifestDto {
+  @IsNumber()
+  @IsPositive()
+  startBlock: number;
+  @IsNumber()
+  @IsPositive()
+  endBlock: number;
+
+  @IsString()
+  @IsEnum(Exchange)
+  exchangeName: Exchange;
+
+  @IsString()
+  tokenA: string;
+  @IsString()
+  tokenB: string;
+
+  @IsNumber()
+  @IsPositive()
+  campaignDuration: number;
+
+  @IsNumber()
+  @IsPositive()
+  fundAmount: number;
+
+  @IsString()
+  requesterDescription: string; // address of launcher
+
+  @IsEnum(JobRequestType)
+  requestType: JobRequestType;
+}
+
+export class CvatData {
+  @IsString()
+  data_url: string;
+}
+
+export class Label {
+  @IsString()
+  name: string;
+}
+
+export class Annotation {
+  @IsArray()
+  labels: Label[];
+
+  @IsString()
+  description: string;
+
+  @IsEnum(JobRequestType)
+  type: JobRequestType;
+
+  @IsNumber()
+  @IsPositive()
+  job_size: number;
+
+  @IsNumber()
+  @IsPositive()
+  max_time: number;
+}
+
+export class Validation {
+  @IsNumber()
+  @IsPositive()
+  min_quality: number;
+
+  @IsNumber()
+  @IsPositive()
+  val_size: number;
+
+  @IsString()
+  gt_url: string;
+}
+
+export class CvatManifestDto {
+  @IsObject()
+  data: CvatData;
+
+  @IsObject()
+  annotation: Annotation;
+
+  @IsObject()
+  validation: Validation;
+
+  @IsString()
+  job_bounty: string;
+}
+
+export class FortuneFinalResultDto {
+  @IsString()
+  exchangeAddress: string;
+
+  @IsString()
+  workerAddress: string;
+
+  @IsString()
+  solution: string;
+}
+
+export class CampaignFinalResultDto {
+  @IsString()
+  exchangeAddress: string;
+
+  @IsString()
+  workerIdentifier: string; // worker address for DEX or read only API key encrypted for CEX
+
+  @IsString()
+  liquidityScore: string;
+}
+
+export class CvatFinalResultDto {
+  @IsString()
+  url: string;
+
+  @IsString()
+  final_answer: string;
+
+  @IsArray()
+  correct: string[];
+
+  @IsArray()
+  wrong: string[];
+}
+
+export class JobListDto {
+  jobId: number;
+  escrowAddress?: string;
+  network: string;
+  fundAmount: number;
+  status: JobStatusFilter;
+}
+
+export class EscrowFailedWebhookDto {
+  @ApiProperty({
+    enum: ChainId,
+  })
+  @IsEnum(ChainId)
+  public chain_id: ChainId;
+
+  @ApiProperty()
+  @IsString()
+  public escrow_address: string;
+
+  @ApiProperty()
+  @IsEnum(EventType)
+  public event_type: EventType;
+
+  @ApiProperty()
+  @IsString()
+  public reason: string;
+}
