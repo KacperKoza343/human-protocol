@@ -204,6 +204,9 @@ export const LaunchJobView = () => {
             variant="contained"
             size="large"
             sx={{ width: '452px' }}
+            disabled={!selectedJobType}
+            href={`${import.meta.env.VITE_APP_JOB_LAUNCHER_URL}/jobs/create`}
+            target="_blank"
           >
             Launch
           </Button>

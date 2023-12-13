@@ -64,7 +64,11 @@ export const OraclesView = () => {
                 <ExchangeOracleIcon sx={{ fontSize: '2.5rem' }} />
               </OracleIcon>
               <Box>
-                <Chip label="HUMAN Protocol core architecture" />
+                <Chip
+                  label="HUMAN Protocol core architecture"
+                  variant="outlined"
+                  color="primary"
+                />
               </Box>
               <Typography
                 variant="h4"
@@ -97,7 +101,11 @@ export const OraclesView = () => {
                 <RecordingOracleIcon sx={{ fontSize: '2.5rem' }} />
               </OracleIcon>
               <Box>
-                <Chip label="HUMAN Protocol core architecture" />
+                <Chip
+                  label="HUMAN Protocol core architecture"
+                  variant="outlined"
+                  color="primary"
+                />
               </Box>
               <Typography
                 variant="h4"
@@ -133,7 +141,11 @@ export const OraclesView = () => {
                 <ReputationOracleIcon sx={{ fontSize: '2.5rem' }} />
               </OracleIcon>
               <Box>
-                <Chip label="HUMAN Protocol core architecture" />
+                <Chip
+                  label="HUMAN Protocol core architecture"
+                  variant="outlined"
+                  color="primary"
+                />
               </Box>
               <Typography
                 variant="h4"

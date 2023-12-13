@@ -9,16 +9,16 @@ import textFreeEntryOcrImg from '../assets/launchpad/task-types/text_free_entry_
 import textMultipleChoiceImg from '../assets/launchpad/task-types/text_multiple_choice.png';
 
 export enum TextLabelingJobType {
-  FREE_ENTRY_OCR = 'FREE_ENTRY_OCR',
+  FREE_ENTRY_OCR = 'TEXT_FREE_ENTRY_OCR',
   MULTIPLE_CHOICE = 'TEXT_MULTIPLE_CHOICE',
 }
 
 export enum ImageLabelingJobType {
-  BINARY = 'BINARY',
-  BOUNDING_BOX = 'BOUNDING_BOX',
-  REDO_BB = 'REDO_BB',
+  BINARY = 'IMAGE_BINARY',
+  BOUNDING_BOX = 'IMAGE_BOUNDING_BOX',
+  REDO_BB = 'IMAGE_REDO_BB',
   MULTIPLE_CHOICE = 'IMAGE_MULTIPLE_CHOICE',
-  SEMANTIC_SEGMENTATION = 'SEMANTIC_SEGMENTATION',
+  SEMANTIC_SEGMENTATION = 'IMAGE_SEMANTIC_SEGMENTATION',
 }
 
 export enum MarketMakingJobType {

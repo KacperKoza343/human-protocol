@@ -6,6 +6,7 @@ interface ImportMetaEnv {
   readonly VITE_APP_WALLETCONNECT_PROJECT_ID: string;
   readonly VITE_APP_ADMIN_API_URL: string;
   readonly VITE_APP_BANNER_API_TOKEN: string;
+  readonly VITE_APP_JOB_LAUNCHER_URL: string;
 }
 
 interface ImportMeta {

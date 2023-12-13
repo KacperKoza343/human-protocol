@@ -5,7 +5,6 @@ import {
   Card,
   CardMedia,
   Collapse,
-  Grid,
   List,
   ListItemButton,
   ListItemText,
@@ -77,8 +76,8 @@ export const JobTypeCard = ({
       sx={{
         boxShadow:
           '0px 1px 5px 0px rgba(233, 235, 250, 0.20), 0px 2px 2px 0px rgba(233, 235, 250, 0.50), 0px 3px 1px -2px #E9EBFA',
-        height: '100%',
         borderRadius: '16px',
+        width: '396px',
       }}
     >
       <Box sx={{ padding: 2 }}>
@@ -111,12 +110,18 @@ export const JobTypeCard = ({
 };
 
 enum JobTypeFilter {
-  All = 'All',
   TextLabeling = 'Text Labeling',
   ImageLabeling = 'Image Labeling',
   MarketMaking = 'Market Making',
   OpenQueries = 'Open Queries',
 }
+
+const defaultFilterKeys = [
+  JobTypeFilter.TextLabeling,
+  JobTypeFilter.ImageLabeling,
+  JobTypeFilter.MarketMaking,
+  JobTypeFilter.OpenQueries,
+];
 
 const FilterData = [
   {
@@ -142,17 +147,17 @@ const FilterData = [
 ];
 
 export const JobTypesView = () => {
-  const [filter, setFilter] = useState(JobTypeFilter.All);
+  const [selectedFilterKeys, setSelectedFilterKeys] =
+    useState<JobTypeFilter[]>(defaultFilterKeys);
 
   const filteredMapData = useMemo(() => {
-    if (filter === JobTypeFilter.All) {
+    if (selectedFilterKeys.length === 4) {
       return FilterData.map(({ labelMap }) => labelMap);
     }
-    const item = FilterData.find(({ filterKey }) => filterKey === filter);
-    if (item) return [item.labelMap];
-
-    return [];
-  }, [filter]);
+    return FilterData.filter(({ filterKey }) =>
+      selectedFilterKeys.includes(filterKey)
+    ).map(({ labelMap }) => labelMap);
+  }, [selectedFilterKeys]);
 
   return (
     <Box mt="58px">
@@ -163,11 +168,11 @@ export const JobTypesView = () => {
           component="nav"
         >
           <ListItemButton
-            onClick={() => setFilter(JobTypeFilter.All)}
-            selected={filter === JobTypeFilter.All}
+            onClick={() => setSelectedFilterKeys(defaultFilterKeys)}
+            selected={selectedFilterKeys.length === 4}
           >
             <Typography variant="body1" color="primary" fontWeight={500}>
-              {JobTypeFilter.All}
+              All
             </Typography>
           </ListItemButton>
           {FilterData.map(({ filterKey, values, labelMap }) => (
@@ -176,25 +181,36 @@ export const JobTypesView = () => {
               label={filterKey}
               values={values}
               labelMap={labelMap}
-              open={filter === filterKey || filter === JobTypeFilter.All}
-              selected={filter === filterKey}
-              onClick={() => setFilter(filterKey)}
+              open={selectedFilterKeys.includes(filterKey)}
+              onClick={() =>
+                selectedFilterKeys.includes(filterKey)
+                  ? setSelectedFilterKeys(
+                      selectedFilterKeys.filter((key) => key !== filterKey)
+                    )
+                  : setSelectedFilterKeys([...selectedFilterKeys, filterKey])
+              }
             />
           ))}
         </List>
-        <Grid container spacing={4}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '32px',
+            flexWrap: 'wrap',
+          }}
+        >
           {filteredMapData
             .flatMap((d) => Object.values(d))
             .map(({ label, description, image }, i) => (
-              <Grid key={i} item xs={12} md={6} lg={4}>
-                <JobTypeCard
-                  label={label}
-                  description={description}
-                  image={image}
-                />
-              </Grid>
+              <JobTypeCard
+                key={i}
+                label={label}
+                description={description}
+                image={image}
+              />
             ))}
-        </Grid>
+        </Box>
       </Box>
     </Box>
   );

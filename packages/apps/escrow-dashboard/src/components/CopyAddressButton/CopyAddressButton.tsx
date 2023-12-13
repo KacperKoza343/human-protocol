@@ -40,7 +40,7 @@ export const CopyAddressButton: FC<CopyAddressButtonProps> = ({
       >
         {address}
       </Typography>
-      <IconButton color="primary" onClick={handleClickCopy}>
+      <IconButton sx={{ color: '#858EC6' }} onClick={handleClickCopy}>
         <CopyLinkIcon />
       </IconButton>
     </Box>

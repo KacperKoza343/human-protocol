@@ -1,4 +1,5 @@
 import { NETWORKS } from '@human-protocol/sdk';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {
   Box,
   Button,
@@ -18,9 +19,9 @@ import {
 } from '@mui/material';
 import { FC } from 'react';
 import { useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
-import addressSvg from 'src/assets/address.svg';
+import networkSvg from 'src/assets/network.svg';
 import {
   CardContainer,
   CardTextRow,
@@ -56,13 +57,25 @@ export const LeaderDetail: FC = () => {
         <Box>Not Found</Box>
       ) : (
         <>
+          <Box>
+            <Link to="/launchpad">
+              <Button
+                variant="text"
+                color="primary"
+                startIcon={<ArrowBackIcon />}
+                sx={{ mb: 2 }}
+              >
+                Back
+              </Button>
+            </Link>
+          </Box>
           <Box
             display="flex"
             alignItems="center"
             flexWrap="wrap"
             gap={{ xs: 3, sm: 4 }}
           >
-            <ViewTitle title="Address" iconUrl={addressSvg} />
+            <ViewTitle title="Address" iconUrl={networkSvg} />
             {!isMobile && <CopyAddressButton address={currentLeader.address} />}
             {!isMobile ? (
               <Box
