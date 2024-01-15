@@ -161,11 +161,13 @@ export class WebhookService {
    */
   @Cron(CronExpression.EVERY_10_MINUTES)
   public async processPendingWebhooks(): Promise<void> {
+    this.logger.log('[processPendingWebhooks] started');
     const isCronJobRunning = await this.cronJobService.isCronJobRunning(
       CronJobType.ProcessPendingWebhook,
     );
 
     if (isCronJobRunning) {
+      this.logger.log('[processPendingWebhooks] duplicate');
       return;
     }
 

@@ -910,11 +910,13 @@ export class JobService {
 
   @Cron(CronExpression.EVERY_10_MINUTES)
   public async createEscrowCronJob() {
+    this.logger.log('[createEscrowCronJob] started');
     const isCronJobRunning = await this.cronJobService.isCronJobRunning(
       CronJobType.CreateEscrow,
     );
 
     if (isCronJobRunning) {
+      this.logger.log('[createEscrowCronJob] duplicate');
       return;
     }
 
@@ -960,11 +962,13 @@ export class JobService {
 
   @Cron(CronExpression.EVERY_10_MINUTES)
   public async setupEscrowCronJob() {
+    this.logger.log('[setupEscrowCronJob] started');
     const isCronJobRunning = await this.cronJobService.isCronJobRunning(
       CronJobType.SetupEscrow,
     );
 
     if (isCronJobRunning) {
+      this.logger.log('[setupEscrowCronJob] duplicate');
       return;
     }
 
@@ -1010,11 +1014,13 @@ export class JobService {
 
   @Cron(CronExpression.EVERY_10_MINUTES)
   public async fundEscrowCronJob() {
+    this.logger.log('[fundEscrowCronJob] started');
     const isCronJobRunning = await this.cronJobService.isCronJobRunning(
       CronJobType.FundEscrow,
     );
 
     if (isCronJobRunning) {
+      this.logger.log('[fundEscrowCronJob] dulpicate');
       return;
     }
 
@@ -1074,11 +1080,13 @@ export class JobService {
 
   @Cron(CronExpression.EVERY_10_MINUTES)
   public async cancelCronJob() {
+    this.logger.log('[cancelEscrowCronJob] started');
     const isCronJobRunning = await this.cronJobService.isCronJobRunning(
       CronJobType.FundEscrow,
     );
 
     if (isCronJobRunning) {
+      this.logger.log('[cancelEscrowCronJob] duplicate');
       return;
     }
 
