@@ -47,7 +47,7 @@ export class AuthJwtController {
   @Public()
   @Post('/signup')
   @UseInterceptors(ClassSerializerInterceptor)
-  @ApiOperation({
+  @ApiOperation({ // Bad error handling. Unified stantard should be defined
     summary: 'User Signup',
     description: 'Endpoint to register a new user.',
   })
@@ -58,11 +58,11 @@ export class AuthJwtController {
   })
   @ApiResponse({
     status: 400,
-    description: 'Bad Request. Invalid input parameters.',
+    description: 'Bad Request. Invalid input parameters.', // Meaningless description. In case of an email duplication should return "Email is already taken"
   })
   public async signup(@Body() data: UserCreateDto): Promise<void> {
     await this.authService.signup(data);
-    return;
+    return; // What is this?
   }
 
   @Public()

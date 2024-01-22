@@ -23,6 +23,9 @@ export class SignInDto {
   public password: string;
 }
 
+/*
+  Remove confirm field
+*/
 export class ValidatePasswordDto {
   @ApiProperty()
   @IsPassword()

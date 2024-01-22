@@ -37,6 +37,35 @@ export class SendGridService {
     );
   }
 
+  /*
+    sendEmail should accept an instance of BaseSendgridEmail class with the folowing structure:
+    export class BaseSendgridEmail {
+      constructor(
+        to: String,
+        templateId: String,
+      )
+
+      public getDynamicData(): Record<String, ...> {
+        return;
+      }
+    }
+
+    export class ResetPasswordEmail extends BaseSendgridEmail {
+      constructor(
+        to: String,
+        url: String,
+      )
+
+      public getDynamicData(): Record<String, ...> {
+        return {
+          url: this.url,
+        }
+      }
+    }
+  */
+  /*
+  async sendEmail(template: BaseSendgridTemplate): Promise<void> {}
+  */
   async sendEmail({
     from = {
       email: this.defaultFromEmail,
@@ -49,8 +78,14 @@ export class SendGridService {
     try {
       await this.mailService.send({
         from,
-        templateId,
-        personalizations,
+        templateId, // template.templateId
+        personalizations, /* [
+          {
+            to: template.to,
+            dynamicTemplateData: Object.assign({ service_name: SERVICE_NAME }, template.getDynamicData())
+          },
+        ]
+        */
         ...emailData,
       });
 

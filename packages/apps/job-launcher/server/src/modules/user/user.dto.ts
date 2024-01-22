@@ -8,7 +8,7 @@ import { Currency } from '../../common/enums/payment';
 export class UserCreateDto extends ValidatePasswordDto {
   @ApiProperty()
   @IsEmail()
-  @Transform(({ value }: { value: string }) => value.toLowerCase())
+  @Transform(({ value }: { value: string }) => value.toLowerCase()) // This should be done on a repository level
   public email: string;
 }
 

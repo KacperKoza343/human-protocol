@@ -54,6 +54,7 @@ export enum ErrorUser {
  * Represents error messages related to auth.
  */
 export enum ErrorAuth {
+  // Add EmailIsAlreadyTaken error
   NotFound = 'Auth not found',
   InvalidEmailOrPassword = 'Invalid email or password',
   RefreshTokenHasExpired = 'Refresh token has expired',

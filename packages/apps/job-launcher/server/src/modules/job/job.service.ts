@@ -944,6 +944,9 @@ export class JobService {
     return finalResultUrl;
   }
 
+  /*
+    Get rid of a standard Cron. Use a google scheduler instead 
+  */
   @Cron(CronExpression.EVERY_10_MINUTES)
   public async createEscrowCronJob() {
     const isCronJobRunning = await this.cronJobService.isCronJobRunning(
@@ -994,6 +997,9 @@ export class JobService {
     await this.cronJobService.completeCronJob(cronJob);
   }
 
+  /*
+    Get rid of a standard Cron. Use a google scheduler instead 
+  */
   @Cron(CronExpression.EVERY_10_MINUTES)
   public async setupEscrowCronJob() {
     const isCronJobRunning = await this.cronJobService.isCronJobRunning(
@@ -1044,6 +1050,9 @@ export class JobService {
     await this.cronJobService.completeCronJob(cronJob);
   }
 
+  /*
+    Get rid of a standard Cron. Use a google scheduler instead 
+  */
   @Cron(CronExpression.EVERY_10_MINUTES)
   public async fundEscrowCronJob() {
     const isCronJobRunning = await this.cronJobService.isCronJobRunning(
@@ -1108,6 +1117,9 @@ export class JobService {
     await this.cronJobService.completeCronJob(cronJob);
   }
 
+  /*
+    Get rid of a standard Cron. Use a google scheduler instead 
+  */
   @Cron(CronExpression.EVERY_10_MINUTES)
   public async cancelCronJob() {
     const isCronJobRunning = await this.cronJobService.isCronJobRunning(

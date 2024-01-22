@@ -90,27 +90,41 @@ export class AuthService {
   }
 
   public async signup(data: UserCreateDto): Promise<UserEntity> {
-    const userEntity = await this.userService.create(data);
+    try {
+      const userEntity = await this.userService.create(data);
 
-    const tokenEntity = await this.tokenRepository.create({
-      tokenType: TokenType.EMAIL,
-      user: userEntity,
-    });
+      const tokenEntity = await this.tokenRepository.create({
+        tokenType: TokenType.EMAIL,
+        user: userEntity,
+      });
 
-    await this.sendgridService.sendEmail({
-      personalizations: [
-        {
-          to: data.email,
-          dynamicTemplateData: {
-            service_name: SERVICE_NAME,
-            url: `${this.feURL}/verify?token=${tokenEntity.uuid}`,
+      /*
+        Create an instance of VerifyEmailTemplate class. 
+      */
+      await this.sendgridService.sendEmail({
+        personalizations: [
+          {
+            to: data.email,
+            dynamicTemplateData: {
+              service_name: SERVICE_NAME,
+              url: `${this.feURL}/verify?token=${tokenEntity.uuid}`,
+            },
           },
-        },
-      ],
-      templateId: SENDGRID_TEMPLATES.signup,
-    });
+        ],
+        templateId: SENDGRID_TEMPLATES.signup,
+      });
 
-    return userEntity;
+      return userEntity;
+    }
+    catch (err) {
+      // Handle errors from other services
+      if (err instanceof /* Error from extended usersRepository */ ) {
+        // return { success: false, errorCode: number }
+      }
+      else if (err instanceof /* Error from sendgrid */ ) {
+        // return { success: true }
+      }
+    }
   }
 
   public async logout(user: UserEntity): Promise<void> {
@@ -161,20 +175,28 @@ export class AuthService {
     if (userEntity.status !== UserStatus.ACTIVE)
       throw new UnauthorizedException(ErrorAuth.UserNotActive);
 
+    /*
+      Add a rate limiter 
+    */
+
     const existingToken = await this.tokenRepository.findOne({
       userId: userEntity.id,
       tokenType: TokenType.PASSWORD,
     });
 
-    if (existingToken) {
+    if (existingToken) { // and not expired => do not send an email
       await existingToken.remove();
     }
-
+    
     const newTokenEntity = await this.tokenRepository.create({
       tokenType: TokenType.PASSWORD,
       user: userEntity,
     });
 
+
+    /*
+      Create an instance of ForgotPasswordTemplate class. 
+    */
     await this.sendgridService.sendEmail({
       personalizations: [
         {
@@ -224,8 +246,13 @@ export class AuthService {
     if (!tokenEntity) {
       throw new NotFoundException('Token not found');
     }
-
+    /*
+      Missing await 
+    */
     this.userService.activate(tokenEntity.user);
+    /*
+      Use a repository method here 
+    */
     await tokenEntity.remove();
   }
 
@@ -233,7 +260,9 @@ export class AuthService {
     data: ResendEmailVerificationDto,
   ): Promise<void> {
     const userEntity = await this.userService.getByEmail(data.email);
-
+    /*
+      Either remove !userEntity or remove ?
+    */
     if (!userEntity || userEntity?.status != UserStatus.PENDING) {
       throw new NotFoundException(ErrorUser.NotFound);
     }
@@ -243,7 +272,14 @@ export class AuthService {
       tokenType: TokenType.EMAIL,
     });
 
+    /*
+      Add a rate limiter
+    */
+
     if (existingToken) {
+      /*
+        Use a token service method here (which will invoke tokenRepository method)
+      */
       await existingToken.remove();
     }
 
@@ -252,6 +288,9 @@ export class AuthService {
       user: userEntity,
     });
 
+    /*
+      Same thing with email template 
+    */
     await this.sendgridService.sendEmail({
       personalizations: [
         {
@@ -263,19 +302,28 @@ export class AuthService {
         },
       ],
       templateId: SENDGRID_TEMPLATES.signup,
-    });
+    }); 
   }
 
+  /*
+    It should be in utils or something like that
+  */
   public hashToken(token: string): string {
     const hash = createHash('sha256');
     hash.update(token + this.salt);
     return hash.digest('hex');
   }
 
+  /*
+    It should be in utils or something like that
+  */
   public compareToken(token: string, hashedToken: string): boolean {
     return this.hashToken(token) === hashedToken;
   }
 
+  /*
+    APIkey related methods should be moved to apikey.service.ts 
+  */
   async createOrUpdateAPIKey(userId: number): Promise<string> {
     const salt = crypto.randomBytes(16).toString('hex');
     const apiKey = crypto.randomBytes(32).toString('hex');

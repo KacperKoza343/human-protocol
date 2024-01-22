@@ -17,7 +17,7 @@ export class UserEntity extends BaseEntity implements IUser {
   @Column({ type: 'varchar' })
   public password: string;
 
-  @Column({ type: 'varchar', nullable: true, unique: true })
+  @Column({ type: 'varchar', nullable: true, unique: true }) // to lowercase should be applied here via transform option
   public email: string;
 
   @Column({ type: 'enum', enum: UserType })

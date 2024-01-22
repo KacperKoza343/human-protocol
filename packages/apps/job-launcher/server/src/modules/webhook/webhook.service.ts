@@ -152,6 +152,9 @@ export class WebhookService {
    * Process a pending webhook job.
    * @returns {Promise<void>} - Returns a promise that resolves when the operation is complete.
    */
+  /*
+    Get rid of a standard Cron. Use a google scheduler instead 
+  */
   @Cron(CronExpression.EVERY_10_MINUTES)
   public async processPendingWebhooks(): Promise<void> {
     const isCronJobRunning = await this.cronJobService.isCronJobRunning(

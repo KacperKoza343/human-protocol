@@ -5,6 +5,10 @@ import { BaseEntity } from '../../database/base.entity';
 import { NS } from '../../common/constants';
 import { IBase } from '../../common/interfaces/base';
 
+/*
+  EMAIL -> EMAIL_VALIDATION
+  PASSWORD -> RESET_PASSWORD
+*/
 export enum TokenType {
   EMAIL = 'EMAIL',
   PASSWORD = 'PASSWORD',

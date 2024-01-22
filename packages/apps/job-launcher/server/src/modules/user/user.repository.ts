@@ -11,6 +11,18 @@ import { UserEntity } from './user.entity';
 import { UserDto, UserUpdateDto } from './user.dto';
 import { ErrorUser } from '../../common/constants/errors';
 
+
+/*
+  This is not a repository.
+  Instead, it should extend typeorm repository to achieve better error handling.
+  Because repos errors should be handled on a service level, by default typeorm exceptions (such as duplicate error)
+  will be bubbled up to controller level.
+  Example of how to extend a repository: https://orkhan.gitbook.io/typeorm/docs/custom-repository
+  Basically, we should create a .createUnique() method that will properly handle repo-level errors.
+  
+  Other methods should be overloaded only for better error handling (!!!)
+*/
+
 @Injectable()
 export class UserRepository {
   private readonly logger = new Logger(UserRepository.name);
