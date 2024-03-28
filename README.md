@@ -19,22 +19,29 @@ Join us on [Discord](http://hmt.ai/discord)
 
 HUMAN is a permissionless protocol to facilitate the exchange of HUMAN work, knowledge, and contribution.  Using HUMAN, individuals, organizations or businesses can either create or complete tasks.  These are tasks that cannot typically be automated or completed by a machine.  The types of work that are currently being completed using the HUMAN Protocol are:
 
-* [Data labeling](https://app.humanprotocol.org/) - HUMAN is currently being used to label raw image data which can subsequently be used to train Machine Learning algorithms.  Last month over 20 Million images were labeled by HUMAN workers: [HUMAN Escrow Scanner](https://dashboard.humanprotocol.org/)
-* [IMOO](https://www.humanprotocol.org/imoo) - An on-chain oracle for decentralized prediction markets
-* [POH](https://www.humanprotocol.org/proof-of-humanity) - A system that brings bot-blocking applications on-chain
+* [Data labeling](https://app.humanprotocol.org/) - HUMAN is currently being used to label raw image data which can subsequently be used to train Machine Learning algorithms.
+* HuFi - HuFi allows for the streamlined deployment of market-making bots, to launch campaigns and market make in a safe, transparent way.
 * …
-
-### Documentation
-
-For a more detailed description of the HUMAN Protocol architecture and vision see [here](https://tech-docs.humanprotocol.org/)
 
 ### Description
 
 As part of our efforts to increase open source contributions we have consolidated all our codebase into a single monorepo.  This monorepo provides an easy and reliable way to  build applications that interact with the HUMAN Protocol.  It has been designed so that it can be extended to meet the requirements of a wide variety of blockchain application use-cases involving human work or contribution.  We have also included various example applications and reference implementations for the core infrastructure components that make up the HUMAN Protocol.
 
+### Documentation
+
+For a more detailed description of the HUMAN Protocol architecture and vision see [here](https://docs.humanprotocol.org/human-tech-docs)
+
 ### Contributing to this repository
 
-The contribution guidelines are as per the CONTRIBUTING.MD file.
+If you're looking to contribute, check out our active projects and see where you can lend a hand:
+* Contributions: Explore our [Contribution Projects](https://github.com/orgs/humanprotocol/projects/20) for areas where you can contribute.
+* Bug Bounty Program: Security is a top priority for us. If you've discovered a security vulnerability, we encourage you to let us know through our [Bug Bounty Program](https://github.com/humanprotocol/bugbounty). Your efforts in making our project more secure are greatly appreciated, and rewards may be available for eligible reports.
+
+You can find contribution guidelines in CONTRIBUTING.MD file.
+
+### Roadmap
+
+For those interested in the latest advancements and contributions from our core team, our [Core Project](https://github.com/orgs/humanprotocol/projects/20) is the place to be. Here, you can keep up with the progress, milestones, and updates directly from our dedicated team members.
 
 ### Project Structure
 
@@ -45,7 +52,9 @@ The contribution guidelines are as per the CONTRIBUTING.MD file.
 │   │   │   ├── ui                           # A UI that queries The Graph for escrow data
 │   │   │   ├── admin                        # Dashboard content admin app
 │   │   ├── faucet-server                    # Faucet server
-│   │   ├── fortune                          # Fortune application
+│   │   ├── fortune                          # Fortune application is test app to showcase the protocol
+│   │   │   ├── exchange-oracle              # Fortune Exchange Oracle
+│   │   │   ├── recording-oracle             # Fortune Recording Oracle
 │   │   ├── job-launcher                     # Job launcher server, and UI
 │   │   ├── human-app                        # Human App server
 │   │   ├── meta-code-verify                 # Browser extensions to verify code
@@ -55,6 +64,8 @@ The contribution guidelines are as per the CONTRIBUTING.MD file.
 │   ├── core                                 # EVM compatible smart contracts for HUMAN
 │   ├── examples
 │   │   ├── cvat                             # An open source annotation tool for labeling video and images
+│   │   │   ├── exchange-oracle              # Cvat Exchange Oracle
+│   │   │   ├── recording-oracle             # Cvat Recording Oracle
 │   ├── sdk
 │   │   ├── python
 │   │   │   ├── human-protocol-sdk           # Python SDK to interact with Human Protocol
@@ -62,20 +73,21 @@ The contribution guidelines are as per the CONTRIBUTING.MD file.
 │   │   │   ├── human-protocol-sdk           # Node.js SDK to interact with Human Protocol
 │   │   │   ├── subgraph                     # Human Protocol Subgraph
 ```
+
 ### Smart contracts
-To access comprehensive information about the smart contracts, please visit the following URL: https://tech-docs.humanprotocol.org/contracts. This resource provides detailed documentation that covers various aspects of the smart contracts used within the Human Protocol ecosystem.
+To access comprehensive information about the smart contracts, please visit the following URL: https://docs.humanprotocol.org/contracts. This resource provides detailed documentation that covers various aspects of the smart contracts used within the Human Protocol ecosystem. 
 
-### How To Use This Repo
+Additionally, for a complete list of all our deployed contract addresses, please visit [Human Contract Addresses](https://docs.humanprotocol.org/human-tech-docs/contract-addresses). This page contains up-to-date information on the addresses of contracts deployed by the Human Protocol across different networks, ensuring developers and users alike have the essential data needed for interaction with our ecosystem.
 
-If you would like to join the HUMAN network as an operator please see the [apps](https://github.com/humanprotocol/human-protocol/tree/main/packages/apps) folder.  Users may participate as any of the following roles:
+### Join the HUMAN Network
 
-* [Job Launcher Operator](https://github.com/humanprotocol/human-protocol/tree/main/packages/apps/job-launcher)
-* [Exchange Oracle Operator](https://github.com/humanprotocol/human-protocol/tree/main/packages/apps/fortune/exchange-oracle)
-* [Recording Oracle Operator](https://github.com/humanprotocol/human-protocol/tree/main/packages/apps/fortune/recording-oracle)
+Interested in becoming an operator within the HUMAN network? Our [technical documentation](https://docs.humanprotocol.org/human-tech-docs) provides all the necessary information on setting up operators, guiding you through the technical setup process step by step.
 
-#### Building New Applications for HUMAN
+### Building New Applications for HUMAN ecosystem
 
-If you are a developer and would like to build on top of HUMAN please see [examples](https://github.com/humanprotocol/human-protocol/tree/main/packages/examples) and [sdk](https://github.com/humanprotocol/human-protocol/tree/main/packages/sdk) folders.
+If you're a developer interested in building on top of HUMAN, you can explore our [SDK documentation](https://sdk.humanprotocol.org/) and [tech docs](https://docs.humanprotocol.org/human-tech-docs), or take a look at our example applications:
+* [Fortune](https://github.com/humanprotocol/human-protocol/tree/main/packages/apps/fortune)
+* [CVAT](https://github.com/humanprotocol/human-protocol/tree/main/packages/examples/cvat)
 
 #### Usage and Installation
 
