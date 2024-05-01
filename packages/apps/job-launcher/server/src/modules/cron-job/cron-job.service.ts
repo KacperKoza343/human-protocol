@@ -86,7 +86,7 @@ export class CronJobService {
     try {
       const jobEntities = await this.jobRepository.findByStatus(
         JobStatus.PAID,
-        2,
+        3,
       );
       for (const jobEntity of jobEntities) {
         try {
@@ -119,7 +119,7 @@ export class CronJobService {
     try {
       const jobEntities = await this.jobRepository.findByStatus(
         JobStatus.CREATED,
-        2,
+        3,
       );
 
       for (const jobEntity of jobEntities) {
@@ -153,7 +153,7 @@ export class CronJobService {
     try {
       const jobEntities = await this.jobRepository.findByStatus(
         JobStatus.SET_UP,
-        2,
+        3,
       );
 
       for (const jobEntity of jobEntities) {
@@ -187,7 +187,7 @@ export class CronJobService {
     try {
       const jobEntities = await this.jobRepository.findByStatus(
         JobStatus.TO_CANCEL,
-        2,
+        3,
       );
 
       for (const jobEntity of jobEntities) {
