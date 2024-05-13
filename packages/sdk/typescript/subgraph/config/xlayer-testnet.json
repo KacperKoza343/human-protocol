@@ -15,7 +15,7 @@
     "abi": "../../../../node_modules/@human-protocol/core/abis/Escrow.json"
   },
   "Staking": {
-    "address": "0x7457d26a3C70Bd71F7557C773b303c1dB82BBB68",
+    "address": "0xbA537fEF2442cD48f60686FE1Bbbe40F964a7940",
     "startBlock": 13484541,
     "abi": "../../../../node_modules/@human-protocol/core/abis/Staking.json"
   },
