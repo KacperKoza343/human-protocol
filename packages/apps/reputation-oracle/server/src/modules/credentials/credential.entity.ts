@@ -4,7 +4,7 @@ import { BaseEntity } from '../../database/base.entity';
 import { CredentialStatus } from '../../common/enums/credential';
 import { UserEntity } from '../user/user.entity';
 
-@Entity({ schema: NS, name: 'credential' })
+@Entity({ schema: NS, name: 'credentials' })
 export class CredentialEntity extends BaseEntity {
   @Column({ type: 'varchar', unique: true })
   public reference: string;
@@ -28,7 +28,7 @@ export class CredentialEntity extends BaseEntity {
   public expiresAt?: Date;
 }
 
-@Entity()
+@Entity({ schema: NS, name: 'credential_validations' })
 export class CredentialValidationEntity extends BaseEntity {
   @ManyToOne(() => CredentialEntity, { eager: true })
   credential: CredentialEntity;
