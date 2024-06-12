@@ -7,6 +7,7 @@ import {
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { HCaptchaConfigService } from '../../common/config/hcaptcha-config.service';
+import { response } from 'express';
 
 @Injectable()
 export class HCaptchaService {
@@ -62,6 +63,11 @@ export class HCaptchaService {
   async registerLabeler(data: hCaptchaRegisterLabeler): Promise<boolean> {
     try {
       const { ip, email, language, country, address } = data;
+      console.log(ip);
+      console.log(email);
+      console.log(language);
+      console.log(country);
+      console.log(ip);
 
       const queryParams: any = {
         api_key: this.hcaptchaConfigService.apiKey,
@@ -87,6 +93,11 @@ export class HCaptchaService {
         return true;
       }
     } catch (error) {
+      this.logger.error(
+        error.response && error.response.data
+          ? error.response.data.message
+          : error,
+      );
       this.logger.error(
         `Error occurred during labeling registration. User: ${data.email}`,
         error,
