@@ -7,6 +7,7 @@ import {
   Label,
 } from '../src/modules/job/job.dto';
 
+export const BASE_URL = 'http://localhost:5000';
 export const MOCK_REQUESTER_TITLE = 'Mock job title';
 export const MOCK_REQUESTER_DESCRIPTION = 'Mock job description';
 export const MOCK_SUBMISSION_REQUIRED = 5;

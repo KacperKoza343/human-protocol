@@ -1,25 +1,13 @@
-import request from 'supertest';
-import * as crypto from 'crypto';
+import { ChainId } from '@human-protocol/sdk';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import * as crypto from 'crypto';
+import stringify from 'json-stable-stringify';
+import request from 'supertest';
 import { AppModule } from '../../src/app.module';
-import { UserRepository } from '../../src/modules/user/user.repository';
-import { UserStatus } from '../../src/common/enums/user';
-import { UserService } from '../../src/modules/user/user.service';
-import { UserEntity } from '../../src/modules/user/user.entity';
-import setupE2eEnvironment from './env-setup';
-import {
-  MOCK_CVAT_DATA,
-  MOCK_CVAT_GT,
-  MOCK_CVAT_LABELS,
-  MOCK_FILE_URL,
-  MOCK_REQUESTER_DESCRIPTION,
-  MOCK_PRIVATE_KEY,
-  MOCK_WEB3_NODE_HOST,
-  MOCK_WEB3_RPC_URL,
-} from '../constants';
-import { JobRequestType, JobStatus } from '../../src/common/enums/job';
+import { S3ConfigService } from '../../src/common/config/s3-config.service';
 import { ErrorJob } from '../../src/common/constants/errors';
+import { JobRequestType, JobStatus } from '../../src/common/enums/job';
 import {
   Currency,
   PaymentSource,
@@ -27,26 +15,33 @@ import {
   PaymentType,
   TokenId,
 } from '../../src/common/enums/payment';
+import { AWSRegions, StorageProviders } from '../../src/common/enums/storage';
+import { UserStatus } from '../../src/common/enums/user';
+import { JobRepository } from '../../src/modules/job/job.repository';
 import { PaymentEntity } from '../../src/modules/payment/payment.entity';
 import { PaymentRepository } from '../../src/modules/payment/payment.repository';
-import { JobRepository } from '../../src/modules/job/job.repository';
-import { AWSRegions, StorageProviders } from '../../src/common/enums/storage';
-import { ChainId } from '@human-protocol/sdk';
-import { StorageService } from '../../src/modules/storage/storage.service';
-import stringify from 'json-stable-stringify';
-import { delay, getFileNameFromURL } from './utils';
 import { PaymentService } from '../../src/modules/payment/payment.service';
-import { NetworkConfigService } from '../../src/common/config/network-config.service';
-import { Web3ConfigService } from '../../src/common/config/web3-config.service';
+import { StorageService } from '../../src/modules/storage/storage.service';
+import { UserEntity } from '../../src/modules/user/user.entity';
+import { UserService } from '../../src/modules/user/user.service';
+import {
+  BASE_URL,
+  MOCK_CVAT_DATA,
+  MOCK_CVAT_GT,
+  MOCK_CVAT_LABELS,
+  MOCK_FILE_URL,
+  MOCK_REQUESTER_DESCRIPTION,
+} from '../constants';
+import { getFileNameFromURL } from './utils';
 
 describe('CVAT E2E workflow', () => {
   let app: INestApplication;
-  let userRepository: UserRepository;
   let paymentRepository: PaymentRepository;
   let jobRepository: JobRepository;
   let userService: UserService;
   let storageService: StorageService;
   let paymentService: PaymentService;
+  let s3ConfigService: S3ConfigService;
 
   let userEntity: UserEntity;
   let accessToken: string;
@@ -57,35 +52,19 @@ describe('CVAT E2E workflow', () => {
   const paymentIntentId = crypto.randomBytes(16).toString('hex');
 
   beforeAll(async () => {
-    setupE2eEnvironment();
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    })
-      .overrideProvider(NetworkConfigService)
-      .useValue({
-        networks: [
-          {
-            chainId: ChainId.LOCALHOST,
-            rpcUrl: MOCK_WEB3_RPC_URL,
-          },
-        ],
-      })
-      .overrideProvider(Web3ConfigService)
-      .useValue({
-        privateKey: MOCK_PRIVATE_KEY,
-        env: MOCK_WEB3_NODE_HOST,
-      })
-      .compile();
+    }).compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
 
-    userRepository = moduleFixture.get<UserRepository>(UserRepository);
     paymentRepository = moduleFixture.get<PaymentRepository>(PaymentRepository);
     jobRepository = moduleFixture.get<JobRepository>(JobRepository);
     userService = moduleFixture.get<UserService>(UserService);
     storageService = moduleFixture.get<StorageService>(StorageService);
     paymentService = moduleFixture.get<PaymentService>(PaymentService);
+    s3ConfigService = moduleFixture.get<S3ConfigService>(S3ConfigService);
 
     userEntity = await userService.create({
       email,
@@ -96,13 +75,11 @@ describe('CVAT E2E workflow', () => {
     userEntity.status = UserStatus.ACTIVE;
     await userEntity.save();
 
-    const signInResponse = await request(app.getHttpServer())
-      .post('/auth/signin')
-      .send({
-        email,
-        password: 'Password1!',
-        h_captcha_token: 'string',
-      });
+    const signInResponse = await request(BASE_URL).post('/auth/signin').send({
+      email,
+      password: 'Password1!',
+      h_captcha_token: 'string',
+    });
 
     accessToken = signInResponse.body.access_token;
 
@@ -118,11 +95,22 @@ describe('CVAT E2E workflow', () => {
       status: PaymentStatus.SUCCEEDED,
     });
     await paymentRepository.createUnique(newPaymentEntity);
-  });
 
-  afterEach(async () => {
-    // Add a delay of 1 second between each test. Prevention: "429 Too Many Requests"
-    await delay(1000);
+    await storageService.minioClient.putObject(
+      s3ConfigService.bucket,
+      '1.jpg',
+      '',
+    );
+    await storageService.minioClient.putObject(
+      s3ConfigService.bucket,
+      '2.jpg',
+      '',
+    );
+    await storageService.minioClient.putObject(
+      s3ConfigService.bucket,
+      '3.jpg',
+      '',
+    );
   });
 
   afterAll(async () => {
@@ -167,9 +155,10 @@ describe('CVAT E2E workflow', () => {
       },
       type: JobRequestType.IMAGE_BOXES,
       fund_amount: 10,
+      currency: TokenId.HMT,
     };
 
-    const response = await request(app.getHttpServer())
+    const response = await request(BASE_URL)
       .post('/job/cvat')
       .set('Authorization', `Bearer ${accessToken}`)
       .send(cvatDto)
@@ -184,10 +173,12 @@ describe('CVAT E2E workflow', () => {
     );
 
     expect(jobEntity).toBeDefined();
-    expect(jobEntity!.status).toBe(JobStatus.PAID);
-    expect(jobEntity!.manifestUrl).toBeDefined();
+    expect(jobEntity?.status).toBe(JobStatus.PAID);
+    expect(jobEntity?.manifestUrl).toBeDefined();
 
-    const manifest = await storageService.download(jobEntity!.manifestUrl);
+    const manifest = JSON.parse(
+      await storageService.download(jobEntity?.manifestUrl as string),
+    );
 
     expect(manifest.job_bounty).toBeDefined();
 
@@ -243,9 +234,10 @@ describe('CVAT E2E workflow', () => {
       },
       type: JobRequestType.IMAGE_POINTS,
       fund_amount: 10,
+      currency: TokenId.HMT,
     };
 
-    const response = await request(app.getHttpServer())
+    const response = await request(BASE_URL)
       .post('/job/cvat')
       .set('Authorization', `Bearer ${accessToken}`)
       .send(cvatDto)
@@ -260,10 +252,12 @@ describe('CVAT E2E workflow', () => {
     );
 
     expect(jobEntity).toBeDefined();
-    expect(jobEntity!.status).toBe(JobStatus.PAID);
-    expect(jobEntity!.manifestUrl).toBeDefined();
+    expect(jobEntity?.status).toBe(JobStatus.PAID);
+    expect(jobEntity?.manifestUrl).toBeDefined();
 
-    const manifest = await storageService.download(jobEntity!.manifestUrl);
+    const manifest = JSON.parse(
+      await storageService.download(jobEntity?.manifestUrl as string),
+    );
 
     expect(manifest.job_bounty).toBeDefined();
 
@@ -334,9 +328,10 @@ describe('CVAT E2E workflow', () => {
       },
       type: JobRequestType.IMAGE_BOXES_FROM_POINTS,
       fund_amount: 10,
+      currency: TokenId.HMT,
     };
 
-    const response = await request(app.getHttpServer())
+    const response = await request(BASE_URL)
       .post('/job/cvat')
       .set('Authorization', `Bearer ${accessToken}`)
       .send(cvatDto)
@@ -351,11 +346,12 @@ describe('CVAT E2E workflow', () => {
     );
 
     expect(jobEntity).toBeDefined();
-    expect(jobEntity!.status).toBe(JobStatus.PAID);
-    expect(jobEntity!.manifestUrl).toBeDefined();
+    expect(jobEntity?.status).toBe(JobStatus.PAID);
+    expect(jobEntity?.manifestUrl).toBeDefined();
 
-    const manifest = await storageService.download(jobEntity!.manifestUrl);
-
+    const manifest = JSON.parse(
+      await storageService.download(jobEntity?.manifestUrl as string),
+    );
     expect(manifest.job_bounty).toBeDefined();
 
     const paymentEntities = await paymentRepository.findByUserAndStatus(
@@ -407,9 +403,10 @@ describe('CVAT E2E workflow', () => {
       },
       type: JobRequestType.IMAGE_BOXES_FROM_POINTS,
       fund_amount: 10,
+      currency: TokenId.HMT,
     };
 
-    const invalidCreateJobResponse = await request(app.getHttpServer())
+    const invalidCreateJobResponse = await request(BASE_URL)
       .post('/job/cvat')
       .set('Authorization', `Bearer ${accessToken}`)
       .send(cvatDto)
@@ -472,9 +469,10 @@ describe('CVAT E2E workflow', () => {
       },
       type: JobRequestType.IMAGE_SKELETONS_FROM_BOXES,
       fund_amount: 10,
+      currency: TokenId.HMT,
     };
 
-    const response = await request(app.getHttpServer())
+    const response = await request(BASE_URL)
       .post('/job/cvat')
       .set('Authorization', `Bearer ${accessToken}`)
       .send(cvatDto)
@@ -489,10 +487,12 @@ describe('CVAT E2E workflow', () => {
     );
 
     expect(jobEntity).toBeDefined();
-    expect(jobEntity!.status).toBe(JobStatus.PAID);
-    expect(jobEntity!.manifestUrl).toBeDefined();
+    expect(jobEntity?.status).toBe(JobStatus.PAID);
+    expect(jobEntity?.manifestUrl).toBeDefined();
 
-    const manifest = await storageService.download(jobEntity!.manifestUrl);
+    const manifest = JSON.parse(
+      await storageService.download(jobEntity?.manifestUrl as string),
+    );
 
     expect(manifest.job_bounty).toBeDefined();
 
@@ -548,9 +548,10 @@ describe('CVAT E2E workflow', () => {
       },
       type: JobRequestType.IMAGE_BOXES_FROM_POINTS,
       fund_amount: 10,
+      currency: TokenId.HMT,
     };
 
-    const invalidCreateJobResponse = await request(app.getHttpServer())
+    const invalidCreateJobResponse = await request(BASE_URL)
       .post('/job/cvat')
       .set('Authorization', `Bearer ${accessToken}`)
       .send(cvatDto)
@@ -583,9 +584,10 @@ describe('CVAT E2E workflow', () => {
       },
       type: JobRequestType.IMAGE_BOXES,
       fund_amount: 100000000,
+      currency: TokenId.HMT,
     };
 
-    const invalidCreateJobResponse = await request(app.getHttpServer())
+    const invalidCreateJobResponse = await request(BASE_URL)
       .post('/job/cvat')
       .set('Authorization', `Bearer ${accessToken}`)
       .send(cvatDto)

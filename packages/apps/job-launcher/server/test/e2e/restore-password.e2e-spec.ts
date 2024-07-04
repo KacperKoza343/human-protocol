@@ -1,8 +1,6 @@
 import request from 'supertest';
 import * as crypto from 'crypto';
 import { HttpStatus, INestApplication } from '@nestjs/common';
-import { Test, TestingModule } from '@nestjs/testing';
-import { AppModule } from '../../src/app.module';
 import { UserRepository } from '../../src/modules/user/user.repository';
 import { TokenRepository } from '../../src/modules/auth/token.repository';
 import { TokenEntity, TokenType } from '../../src/modules/auth/token.entity';
@@ -10,15 +8,9 @@ import { UserStatus } from '../../src/common/enums/user';
 import { UserService } from '../../src/modules/user/user.service';
 import { UserEntity } from '../../src/modules/user/user.entity';
 import { ErrorAuth } from '../../src/common/constants/errors';
-import setupE2eEnvironment from './env-setup';
-import { NetworkConfigService } from '../../src/common/config/network-config.service';
-import { Web3ConfigService } from '../../src/common/config/web3-config.service';
-import { ChainId } from '@human-protocol/sdk';
-import {
-  MOCK_PRIVATE_KEY,
-  MOCK_WEB3_NODE_HOST,
-  MOCK_WEB3_RPC_URL,
-} from '../constants';
+import { BASE_URL } from '../../test/constants';
+import { Test, TestingModule } from '@nestjs/testing';
+import { AppModule } from '../../src/app.module';
 
 describe('Restore password E2E workflow', () => {
   let app: INestApplication;
@@ -32,25 +24,9 @@ describe('Restore password E2E workflow', () => {
   const email = `${crypto.randomBytes(16).toString('hex')}@hmt.ai`;
 
   beforeAll(async () => {
-    setupE2eEnvironment();
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    })
-      .overrideProvider(NetworkConfigService)
-      .useValue({
-        networks: [
-          {
-            chainId: ChainId.LOCALHOST,
-            rpcUrl: MOCK_WEB3_RPC_URL,
-          },
-        ],
-      })
-      .overrideProvider(Web3ConfigService)
-      .useValue({
-        privateKey: MOCK_PRIVATE_KEY,
-        env: MOCK_WEB3_NODE_HOST,
-      })
-      .compile();
+    }).compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
@@ -66,7 +42,7 @@ describe('Restore password E2E workflow', () => {
     });
 
     userEntity.status = UserStatus.ACTIVE;
-    await userEntity.save();
+    await userRepository.save(userEntity);
 
     tokenEntity = new TokenEntity();
     tokenEntity.type = TokenType.EMAIL;
@@ -83,7 +59,7 @@ describe('Restore password E2E workflow', () => {
 
   it('should restore password successfully', async () => {
     // Call forgot password endpoint
-    await request(app.getHttpServer())
+    await request(BASE_URL)
       .post('/auth/forgot-password')
       .send({ email })
       .expect(HttpStatus.NO_CONTENT);
@@ -104,23 +80,23 @@ describe('Restore password E2E workflow', () => {
     // Call restore password endpoint
     const restorePasswordData = {
       password: 'NewPassword1!',
-      token: newToken!.uuid,
+      token: newToken?.uuid,
       hCaptchaToken: 'string',
     };
-    await request(app.getHttpServer())
+    await request(BASE_URL)
       .post('/auth/restore-password')
       .send(restorePasswordData)
       .expect(HttpStatus.NO_CONTENT);
 
     // Ensure password was updated
-    const updatedUser = await userRepository.findById(userEntity!.id);
-    expect(updatedUser!.password).not.toEqual(userEntity.password);
+    const updatedUser = await userRepository.findById(userEntity.id);
+    expect(updatedUser?.password).not.toEqual(userEntity.password);
 
-    userEntity = updatedUser!;
+    if (updatedUser) userEntity = updatedUser;
 
     // Ensure new token was deleted
     const deletedToken = await tokenRepository.findOneByUuidAndType(
-      newToken!.uuid,
+      newToken?.uuid as string,
       TokenType.PASSWORD,
     );
     expect(deletedToken).toBeNull();
@@ -128,7 +104,7 @@ describe('Restore password E2E workflow', () => {
 
   it('should handle invalid token error', async () => {
     // Call forgot password endpoint
-    await request(app.getHttpServer())
+    await request(BASE_URL)
       .post('/auth/forgot-password')
       .send({ email })
       .expect(HttpStatus.NO_CONTENT);
@@ -144,7 +120,7 @@ describe('Restore password E2E workflow', () => {
       hCaptchaToken: 'string',
     };
 
-    const invalidRestorePasswordResponse = await request(app.getHttpServer())
+    const invalidRestorePasswordResponse = await request(BASE_URL)
       .post('/auth/restore-password')
       .send(restorePasswordData)
       .expect(HttpStatus.FORBIDDEN);
@@ -156,12 +132,12 @@ describe('Restore password E2E workflow', () => {
 
     // Ensure password was not updated
     const updatedUser = await userRepository.findById(userEntity.id);
-    expect(updatedUser!.password).toEqual(userEntity.password);
+    expect(updatedUser?.password).toEqual(userEntity.password);
   });
 
   it('should handle token expired error', async () => {
     // Call forgot password endpoint
-    await request(app.getHttpServer())
+    await request(BASE_URL)
       .post('/auth/forgot-password')
       .send({ email })
       .expect(HttpStatus.NO_CONTENT);
@@ -172,17 +148,17 @@ describe('Restore password E2E workflow', () => {
       userEntity.id,
       TokenType.PASSWORD,
     );
-    expiredToken!.expiresAt = new Date(date.getTime() - 100000); // Set token expiration in the past
-    await expiredToken!.save();
+    (expiredToken as TokenEntity).expiresAt = new Date(date.getTime() - 100000); // Set token expiration in the past
+    await expiredToken?.save();
 
     // Call restore password endpoint with expired token
-    const expiredTokenValue = expiredToken!.uuid;
+    const expiredTokenValue = expiredToken?.uuid;
     const restorePasswordData = {
       password: 'NewPassword2!',
       token: expiredTokenValue,
       hCaptchaToken: 'string',
     };
-    const invalidRestorePasswordResponse = await request(app.getHttpServer())
+    const invalidRestorePasswordResponse = await request(BASE_URL)
       .post('/auth/restore-password')
       .send(restorePasswordData);
 
@@ -193,6 +169,6 @@ describe('Restore password E2E workflow', () => {
 
     // Ensure password was not updated
     const updatedUser = await userRepository.findById(userEntity.id);
-    expect(updatedUser!.password).toEqual(userEntity.password);
+    expect(updatedUser?.password).toEqual(userEntity.password);
   });
 });

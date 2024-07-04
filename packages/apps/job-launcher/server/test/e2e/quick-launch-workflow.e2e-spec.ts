@@ -1,17 +1,11 @@
-import request from 'supertest';
-import * as crypto from 'crypto';
+import { ChainId } from '@human-protocol/sdk';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import * as crypto from 'crypto';
+import request from 'supertest';
 import { AppModule } from '../../src/app.module';
-import { UserRepository } from '../../src/modules/user/user.repository';
-import { UserStatus } from '../../src/common/enums/user';
-import { UserService } from '../../src/modules/user/user.service';
-import { UserEntity } from '../../src/modules/user/user.entity';
-import setupE2eEnvironment from './env-setup';
-import { MOCK_FILE_HASH, MOCK_FILE_URL } from '../../test/constants';
-import { JobRequestType, JobStatus } from '../../src/common/enums/job';
-import { ChainId } from '@human-protocol/sdk';
 import { ErrorJob } from '../../src/common/constants/errors';
+import { JobRequestType, JobStatus } from '../../src/common/enums/job';
 import {
   Currency,
   PaymentSource,
@@ -19,21 +13,17 @@ import {
   PaymentType,
   TokenId,
 } from '../../src/common/enums/payment';
+import { UserStatus } from '../../src/common/enums/user';
+import { JobRepository } from '../../src/modules/job/job.repository';
 import { PaymentEntity } from '../../src/modules/payment/payment.entity';
 import { PaymentRepository } from '../../src/modules/payment/payment.repository';
-import { JobRepository } from '../../src/modules/job/job.repository';
 import { PaymentService } from '../../src/modules/payment/payment.service';
-import { NetworkConfigService } from '../../src/common/config/network-config.service';
-import { Web3ConfigService } from '../../src/common/config/web3-config.service';
-import {
-  MOCK_PRIVATE_KEY,
-  MOCK_WEB3_NODE_HOST,
-  MOCK_WEB3_RPC_URL,
-} from '../constants';
+import { UserEntity } from '../../src/modules/user/user.entity';
+import { UserService } from '../../src/modules/user/user.service';
+import { BASE_URL, MOCK_FILE_HASH, MOCK_FILE_URL } from '../../test/constants';
 
 describe('Quick launch E2E workflow', () => {
   let app: INestApplication;
-  let userRepository: UserRepository;
   let paymentRepository: PaymentRepository;
   let jobRepository: JobRepository;
   let userService: UserService;
@@ -47,30 +37,13 @@ describe('Quick launch E2E workflow', () => {
   const paymentIntentId = crypto.randomBytes(16).toString('hex');
 
   beforeAll(async () => {
-    setupE2eEnvironment();
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    })
-      .overrideProvider(NetworkConfigService)
-      .useValue({
-        networks: [
-          {
-            chainId: ChainId.LOCALHOST,
-            rpcUrl: MOCK_WEB3_RPC_URL,
-          },
-        ],
-      })
-      .overrideProvider(Web3ConfigService)
-      .useValue({
-        privateKey: MOCK_PRIVATE_KEY,
-        env: MOCK_WEB3_NODE_HOST,
-      })
-      .compile();
+    }).compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
 
-    userRepository = moduleFixture.get<UserRepository>(UserRepository);
     paymentRepository = moduleFixture.get<PaymentRepository>(PaymentRepository);
     jobRepository = moduleFixture.get<JobRepository>(JobRepository);
     userService = moduleFixture.get<UserService>(UserService);
@@ -106,7 +79,7 @@ describe('Quick launch E2E workflow', () => {
       transaction: paymentIntentId,
       status: PaymentStatus.SUCCEEDED,
     });
-    await paymentRepository.createUnique(newPaymentEntity);
+    await paymentRepository.save(newPaymentEntity);
   });
 
   afterAll(async () => {
@@ -125,7 +98,7 @@ describe('Quick launch E2E workflow', () => {
       fund_amount: 10, // HMT
     };
 
-    const response = await request(app.getHttpServer())
+    const response = await request(BASE_URL)
       .post('/job/quick-launch')
       .set('Authorization', `Bearer ${accessToken}`)
       .send(quickLaunchDto)
@@ -134,21 +107,25 @@ describe('Quick launch E2E workflow', () => {
     expect(response.text).toBeDefined();
     expect(typeof response.text).toBe('string');
 
-    const jobEntity = await jobRepository.findOneByIdAndUserId(
-      Number(response.text),
-      userEntity.id,
-    );
+    const jobEntity = await jobRepository.findOne({
+      where: {
+        id: Number(response.text),
+        userId: userEntity.id,
+      },
+    });
 
     expect(jobEntity).toBeDefined();
-    expect(jobEntity!.status).toBe(JobStatus.PAID);
+    expect(jobEntity?.status).toBe(JobStatus.PAID);
 
-    const paymentEntities = await paymentRepository.findByUserAndStatus(
-      userEntity.id,
-      PaymentStatus.SUCCEEDED,
-    );
+    const paymentEntities = await paymentRepository.find({
+      where: {
+        userId: userEntity.id,
+        status: PaymentStatus.SUCCEEDED,
+        type: PaymentType.WITHDRAWAL,
+      },
+    });
 
     expect(paymentEntities[0]).toBeDefined();
-    expect(paymentEntities[0].type).toBe(PaymentType.WITHDRAWAL);
     expect(paymentEntities[0].currency).toBe(TokenId.HMT);
 
     const paidAmount = paymentEntities[0].rate * paymentEntities[0].amount;
@@ -165,7 +142,7 @@ describe('Quick launch E2E workflow', () => {
       fund_amount: 100000000, // HMT
     };
 
-    const invalidQuickLaunchResponse = await request(app.getHttpServer())
+    const invalidQuickLaunchResponse = await request(BASE_URL)
       .post('/job/quick-launch')
       .set('Authorization', `Bearer ${accessToken}`)
       .send(quickLaunchData)
@@ -185,7 +162,7 @@ describe('Quick launch E2E workflow', () => {
       fund_amount: 10, // HMT
     };
 
-    const invalidQuickLaunchResponse = await request(app.getHttpServer())
+    const invalidQuickLaunchResponse = await request(BASE_URL)
       .post('/job/quick-launch')
       .set('Authorization', `Bearer ${accessToken}`)
       .send(quickLaunchData)

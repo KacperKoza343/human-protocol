@@ -90,7 +90,7 @@ export async function listObjectsInBucket(url: URL): Promise<string[]> {
               : ''
           }${url.pathname ? `&prefix=${url.pathname.replace(/^\//, '')}` : ''}`;
         } else {
-          requestOptions += `${url.pathname ? `${url.pathname.replace(/^\//, '')}` : ''}?list-type=2${
+          requestOptions += `${url.pathname ? `${url.pathname}` : ''}?list-type=2${
             nextContinuationToken
               ? `&continuation-token=${encodeURIComponent(
                   nextContinuationToken,
