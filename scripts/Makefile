@@ -103,7 +103,7 @@ web3: check-core-folders
 
 e2e-tests: check-core-folders minio
 	@echo "RUNNING E2E TESTS..."
-	@trap 'kill -9 $$PID_HARDHAT $$PID_JL_SERVER $$PID_EXO $$PID_RECO $$PID_REPO; docker compose -f ./fortune/docker-compose.yml down; exit 0' SIGINT ERR; \
+	@trap 'kill -9 $$PID_HARDHAT $$PID_JL_SERVER $$PID_EXO $$PID_RECO $$PID_REPO; docker compose -f ./fortune/docker-compose.yml down; exit 0' SIGINT ERR;
 	POSTGRES_VOLUME="" $(MAKE) hardhat-node > /dev/null 2>&1 & PID_HARDHAT=$$!; \
 	$(MAKE) job-launcher-server > /dev/null 2>&1 & PID_JL_SERVER=$$!; \
 	$(MAKE) fortune-exchange-oracle > /dev/null 2>&1 & PID_EXO=$$!; \
