@@ -1,4 +1,4 @@
-.PHONY: check-file fortune
+.PHONY: check-core-folders fortune e2e-tests
 
 check-core-folders:
 	@if [ ! -d "../packages/core/abis/legacy" ] || [ ! -d "../packages/core/typechain-types" ]; then \
@@ -71,11 +71,11 @@ rpc-health-check:
 	@until curl -s -X POST "http://localhost:8545" -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"web3_clientVersion","params":[],"id":1}' | grep -q "result"; do \
 		sleep 2; \
 	done
-	
+
 fortune: check-core-folders minio
 	@echo "RUNNING FORTUNE..."
 	@trap 'echo "STOPPING FORTUNE.."; kill -9 $$PID_HARDHAT $$PID_JL_CLIENT $$PID_JL_SERVER $$PID_EXO $$PID_RECO $$PID_REPO; docker compose -f ./fortune/docker-compose.yml down; exit 0' SIGINT ERR; \
-	$(MAKE) hardhat-node & PID_HARDHAT=$$!; \
+	POSTGRES_VOLUME=./docker-db:/var/lib/postgresql/data $(MAKE) hardhat-node & PID_HARDHAT=$$!; \
 	$(MAKE) job-launcher-client & PID_JL_CLIENT=$$!; \
 	$(MAKE) job-launcher-server & PID_JL_SERVER=$$!; \
 	$(MAKE) fortune-exchange-oracle & PID_EXO=$$!; \
@@ -99,4 +99,20 @@ web3: check-core-folders
 	@trap 'echo "STOPPING WEB3.."; kill -9 $$PID_HARDHAT; docker compose -f ./web3/docker-compose.yml down; exit 0' SIGINT ERR; \
 	$(MAKE) hardhat-node & PID_HARDHAT=$$!; \
 	$(MAKE) web3-subgraph & \
+	wait
+
+e2e-tests: check-core-folders minio
+	@echo "RUNNING E2E TESTS..."
+	@trap 'kill -9 $$PID_HARDHAT $$PID_JL_SERVER $$PID_EXO $$PID_RECO $$PID_REPO; docker compose -f ./fortune/docker-compose.yml down; exit 0' SIGINT ERR; \
+	POSTGRES_VOLUME="" $(MAKE) hardhat-node > /dev/null 2>&1 & PID_HARDHAT=$$!; \
+	$(MAKE) job-launcher-server > /dev/null 2>&1 & PID_JL_SERVER=$$!; \
+	$(MAKE) fortune-exchange-oracle > /dev/null 2>&1 & PID_EXO=$$!; \
+	$(MAKE) fortune-recording-oracle > /dev/null 2>&1 & PID_RECO=$$!; \
+	$(MAKE) reputation-oracle > /dev/null 2>&1 & PID_REPO=$$!; \
+	$(MAKE) subgraph > /dev/null 2>&1 & SUBGRAPH_PID=$$!; \
+	while ! curl -s -o /dev/null -w "%{http_code}" http://localhost:5000 | grep -q "301"; do sleep 1; done; \
+	yarn workspace @human-protocol/job-launcher-server test:e2e --runInBand;
+	@echo "STOPPING E2E TESTS..."
+	kill -9 $$PID_HARDHAT $$PID_JL_SERVER $$PID_EXO $$PID_RECO $$PID_REPO; \
+	docker compose -f ./fortune/docker-compose.yml down; \
 	wait
