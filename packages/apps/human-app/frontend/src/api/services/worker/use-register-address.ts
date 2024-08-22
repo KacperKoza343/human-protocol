@@ -41,12 +41,15 @@ export function useRegisterAddressMutation(callbacks?: {
       if (!address) {
         throw new Error(t('errors.unknown'));
       }
+      console.log('send prepare');
       const dataToSign = await prepareSignature({
         address,
         type: PrepareSignatureType.RegisterAddress,
       });
       const messageToSign = JSON.stringify(dataToSign);
+      console.log({ messageToSign });
       const signature = await signMessage(messageToSign);
+      console.log('after sign message');
 
       if (!signature) {
         throw new Error(t('errors.unknown'));

@@ -4,7 +4,14 @@ import {
   useWeb3Modal,
   useWeb3ModalAccount,
 } from '@web3modal/ethers/react';
-import type { JsonRpcSigner, BrowserProvider, Eip1193Provider } from 'ethers';
+import {
+  type JsonRpcSigner,
+  type BrowserProvider,
+  type Eip1193Provider,
+  ethers,
+  hexlify,
+  toUtf8Bytes,
+} from 'ethers';
 import React, { createContext, useEffect, useState } from 'react';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useWeb3Provider } from '@/hooks/use-web3-provider';
@@ -105,9 +112,28 @@ export function WalletConnectProvider({
               openModal,
               signMessage: async (message: string) => {
                 try {
-                  const signature =
-                    await web3ProviderMutation.data.signer.signMessage(message);
-                  return signature;
+                  if (
+                    web3ProviderMutation.data.walletType === 'walletConnect'
+                  ) {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+                    return await web3ProviderMutation.data.provider.send(
+                      'personal_sign',
+                      [hexlify(toUtf8Bytes(message)), address.toLowerCase()]
+                    );
+                  } else {
+
+                    return await web3ProviderMutation.data.signer.signMessage(
+                      message
+                    );
+                  }
+                  // return await web3ProviderMutation.data.signer.signMessage(
+                  //   message
+                  // );
+
+                  // const signature =
+                  //   await web3ProviderMutation.data.signer.signMessage(message);
+
+                  // return signature;
                 } catch (error) {
                   throw new JsonRpcError(error);
                 }
