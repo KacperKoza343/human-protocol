@@ -15,9 +15,9 @@ export type Mainnet = 'Polygon';
 
 export const TestnetContracts: Record<Testnet, ContractsAddresses> = {
   Amoy: {
-    Staking: NETWORKS[ChainId.POLYGON_AMOY]?.stakingAddress ?? '',
-    HMToken: NETWORKS[ChainId.POLYGON_AMOY]?.hmtAddress ?? '',
-    EthKVStore: NETWORKS[ChainId.POLYGON_AMOY]?.kvstoreAddress ?? '',
+    Staking: '0x7457d26a3C70Bd71F7557C773b303c1dB82BBB68',
+    HMToken: '0x792abbcC99c01dbDec49c9fa9A828a186Da45C33',
+    EthKVStore: '0xCc0AF0635aa19fE799B6aFDBe28fcFAeA7f00a60',
   },
 };
 

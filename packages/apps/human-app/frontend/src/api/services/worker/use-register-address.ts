@@ -11,6 +11,7 @@ import {
 import type { ResponseError } from '@/shared/types/global.type';
 import { useGetAccessTokenMutation } from '@/api/services/common/get-access-token';
 import { useWalletConnect } from '@/hooks/use-wallet-connect';
+import { useSignMessage } from 'wagmi';
 
 const RegisterAddressSuccessSchema = z.unknown();
 
@@ -34,8 +35,8 @@ export function useRegisterAddressMutation(callbacks?: {
   const queryClient = useQueryClient();
   const { user } = useAuthenticatedUser();
   const { mutateAsync: getAccessTokenMutation } = useGetAccessTokenMutation();
-
-  const { address, signMessage } = useWalletConnect();
+  const { signMessageAsync } = useSignMessage();
+  const { address } = useWalletConnect();
   return useMutation({
     mutationFn: async () => {
       if (!address) {
@@ -48,7 +49,7 @@ export function useRegisterAddressMutation(callbacks?: {
       });
       const messageToSign = JSON.stringify(dataToSign);
       console.log({ messageToSign });
-      const signature = await signMessage(messageToSign);
+      const signature = await signMessageAsync({ message: messageToSign });
       console.log('after sign message');
 
       if (!signature) {

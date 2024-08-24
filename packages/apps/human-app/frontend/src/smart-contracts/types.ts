@@ -1,8 +1,8 @@
-import type { BrowserProvider, JsonRpcSigner } from 'ethers';
+import type { FallbackProvider, JsonRpcProvider, JsonRpcSigner } from 'ethers';
 
 export interface ContractCallArguments {
   contractAddress: string;
   chainId: number;
-  provider?: BrowserProvider;
+  provider?: JsonRpcProvider | FallbackProvider;
   signer?: JsonRpcSigner;
 }

@@ -4,10 +4,7 @@ import { hmTokenDecimals } from '@/smart-contracts/HMToken/hm-token-decimals';
 import { getContractAddress } from '@/smart-contracts/get-contract-address';
 
 export function useHMTokenDecimals() {
-  const {
-    chainId,
-    web3ProviderMutation: { data },
-  } = useConnectedWallet();
+  const { chainId, signer } = useConnectedWallet();
 
   return useQuery({
     queryFn: () => {
@@ -17,9 +14,9 @@ export function useHMTokenDecimals() {
       return hmTokenDecimals({
         contractAddress,
         chainId,
-        signer: data?.signer,
+        signer,
       });
     },
-    queryKey: ['decimals', chainId, data?.signer || 'signer'],
+    queryKey: ['decimals', chainId, signer],
   });
 }

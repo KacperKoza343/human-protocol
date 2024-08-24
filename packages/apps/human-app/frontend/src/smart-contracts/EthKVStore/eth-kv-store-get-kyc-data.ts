@@ -24,7 +24,9 @@ export async function ethKVStoreGetKycData({
       chain = TestnetChains[0];
     }
 
-    const provider = new ethers.JsonRpcProvider(chain.rpcUrl);
+    const provider = new ethers.JsonRpcProvider(
+      chain.rpcUrls.default.http[0] as string
+    );
 
     const ethKVStoreContract = new Contract(
       contractAddress,

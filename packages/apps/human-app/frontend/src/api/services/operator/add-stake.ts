@@ -93,11 +93,7 @@ async function addStakeMutationFn(
 }
 
 export function useAddStakeMutation() {
-  const {
-    chainId,
-    address,
-    web3ProviderMutation: { data: web3data },
-  } = useConnectedWallet();
+  const { chainId, address, provider, signer } = useConnectedWallet();
   const { data: HMTDecimals } = useHMTokenDecimals();
 
   const queryClient = useQueryClient();
@@ -108,8 +104,8 @@ export function useAddStakeMutation() {
       addStakeMutationFn({
         ...data,
         address,
-        provider: web3data?.provider,
-        signer: web3data?.signer,
+        provider,
+        signer,
         chainId,
         decimals: HMTDecimals,
       }),

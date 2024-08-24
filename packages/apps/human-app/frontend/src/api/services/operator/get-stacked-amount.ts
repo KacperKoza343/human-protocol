@@ -16,11 +16,7 @@ export const stakedAmountFormatter = (amount: bigint) => {
 };
 
 export function useGetStakedAmount() {
-  const {
-    address,
-    chainId,
-    web3ProviderMutation: { data },
-  } = useConnectedWallet();
+  const { address, chainId, signer } = useConnectedWallet();
 
   return useQuery({
     queryFn: async () => {
@@ -31,12 +27,12 @@ export function useGetStakedAmount() {
         contractAddress,
         stakerAddress: address,
         chainId,
-        signer: data?.signer,
+        signer,
       });
 
       return stakeAmount;
     },
-    queryKey: ['getStackedAmount', address, chainId, data?.signer],
+    queryKey: ['getStackedAmount', address, chainId, signer],
     refetchInterval: 0,
   });
 }

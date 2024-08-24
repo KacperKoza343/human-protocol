@@ -25,11 +25,7 @@ export type GetEthKVStoreValuesSuccessResponse = z.infer<
 >;
 
 export function useGetKeys() {
-  const {
-    chainId,
-    address,
-    web3ProviderMutation: { data },
-  } = useConnectedWallet();
+  const { chainId, address, signer } = useConnectedWallet();
 
   return useQuery({
     queryFn: async () => {
@@ -40,12 +36,12 @@ export function useGetKeys() {
         accountAddress: address,
         contractAddress,
         chainId,
-        signer: data?.signer,
+        signer,
       });
 
       const validData = getEthKVStoreValuesSuccessSchema.parse(result);
       return validData;
     },
-    queryKey: [chainId, address, data?.signer],
+    queryKey: [chainId, address, signer],
   });
 }

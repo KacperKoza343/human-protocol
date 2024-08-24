@@ -4,7 +4,6 @@ import { Navigate } from 'react-router-dom';
 import { PageCard } from '@/components/ui/page-card';
 import { useWalletConnect } from '@/hooks/use-wallet-connect';
 import { Alert } from '@/components/ui/alert';
-import { defaultErrorMessage } from '@/shared/helpers/default-error-message';
 import { Button } from '@/components/ui/button';
 import { useModalStore } from '@/components/ui/modal/modal.store';
 import { routerPaths } from '@/router/router-paths';
@@ -12,22 +11,10 @@ import { routerPaths } from '@/router/router-paths';
 export function ConnectWalletOperatorPage() {
   const { t } = useTranslation();
   const { openModal } = useModalStore();
-  const {
-    isConnected,
-    web3ProviderMutation: {
-      error: web3ProviderError,
-      status: web3ProviderStatus,
-    },
-  } = useWalletConnect();
+  const { isConnected } = useWalletConnect();
 
   const getAlert = () => {
     switch (true) {
-      case web3ProviderStatus === 'error':
-        return (
-          <Alert color="error" severity="error" sx={{ width: '100%' }}>
-            {defaultErrorMessage(web3ProviderError)}
-          </Alert>
-        );
       case isConnected:
         return (
           <Alert color="success" severity="success" sx={{ width: '100%' }}>

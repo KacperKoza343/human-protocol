@@ -26,11 +26,17 @@ const config = defineConfig({
     target: 'esnext',
   },
   server: {
-    host: '127.0.0.1',
+    host: 'localhost',
     port: 3001,
   },
   optimizeDeps: {
-    include: ['@mui/material', '@emotion/react', '@emotion/styled'],
+    include: [
+      '@mui/material',
+      '@emotion/react',
+      '@emotion/styled',
+      '@mui/material/Tooltip',
+      '@mui/material/Paper',
+    ],
   },
 });
 

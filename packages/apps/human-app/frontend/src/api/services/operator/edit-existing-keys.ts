@@ -109,11 +109,7 @@ function editExistingKeysMutationFn(
 }
 
 export function useEditExistingKeysMutation() {
-  const {
-    address,
-    chainId,
-    web3ProviderMutation: { data: web3Data },
-  } = useConnectedWallet();
+  const { address, chainId, signer } = useConnectedWallet();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -122,7 +118,7 @@ export function useEditExistingKeysMutation() {
       editExistingKeysMutationFn(data, {
         accountAddress: address,
         chainId,
-        signer: web3Data?.signer,
+        signer,
       }),
     onSuccess: async () => {
       navigate(routerPaths.operator.editExistingKeysSuccess);

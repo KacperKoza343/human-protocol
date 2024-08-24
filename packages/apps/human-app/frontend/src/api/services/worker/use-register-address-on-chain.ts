@@ -35,11 +35,11 @@ async function registerAddressInKVStore({
 export function useRegisterAddressOnChainMutation() {
   const queryClient = useQueryClient();
   const { user } = useAuthenticatedUser();
-  const { web3ProviderMutation, chainId, address } = useWalletConnect();
+  const { provider, chainId, address, signer } = useWalletConnect();
 
   return useMutation({
     mutationFn: async (data: SignedAddressSuccess) => {
-      const network = await web3ProviderMutation.data?.provider.getNetwork();
+      const network = await provider?.getNetwork();
 
       if (!network) {
         throw new Error('No network');
@@ -51,7 +51,7 @@ export function useRegisterAddressOnChainMutation() {
 
       await registerAddressInKVStore({
         ...data,
-        signer: web3ProviderMutation.data?.signer,
+        signer,
         chainId: chainId || -1,
       });
     },
