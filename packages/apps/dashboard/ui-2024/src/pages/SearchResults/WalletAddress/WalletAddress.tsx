@@ -7,6 +7,7 @@ import { AddressDetailsWallet } from '@services/api/use-address-details';
 import { useHMTPrice } from '@services/api/use-hmt-price';
 import { WalletAddressTransactionsTable } from '@pages/SearchResults/WalletAddress/WalletAddressTransactions/WalletAddressTransactionsTable';
 import { useWalletSearch } from '@utils/hooks/use-wallet-search';
+import { NumericFormat } from 'react-number-format';
 
 const HmtPrice = () => {
 	const {
@@ -46,6 +47,7 @@ const WalletAddress = ({
 }: {
 	data: AddressDetailsWallet;
 }) => {
+	console.log('balance:', balance);
 	const { filterParams } = useWalletSearch();
 
 	return (
@@ -60,7 +62,12 @@ const WalletAddress = ({
 				<Stack gap={4}>
 					<TitleSectionWrapper title="Balance">
 						<Typography>
-							{balance}
+							<NumericFormat
+								displayType="text"
+								value={Number(balance) < 1 ? Number(balance) * 1e18 : balance}
+								thousandSeparator=","
+								decimalScale={0}
+							/>
 							<Typography
 								sx={{
 									marginLeft: 0.5,
