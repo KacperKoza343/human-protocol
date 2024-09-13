@@ -47,7 +47,6 @@ const WalletAddress = ({
 }: {
 	data: AddressDetailsWallet;
 }) => {
-	console.log('balance:', balance);
 	const { filterParams } = useWalletSearch();
 
 	return (
