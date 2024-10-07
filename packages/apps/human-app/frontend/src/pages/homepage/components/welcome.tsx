@@ -1,5 +1,6 @@
 import { Divider, Grid, Paper, Stack, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import { useEffect } from 'react';
 import {
   HomepageLogoIcon,
   HomepageUserIcon,
@@ -7,18 +8,66 @@ import {
   MobileHomeIcons,
 } from '@/components/ui/icons';
 import { Button } from '@/components/ui/button';
-import { colorPalette } from '@/styles/color-palette';
 import { useIsMobile } from '@/hooks/use-is-mobile';
 import { OperatorSignIn } from '@/pages/homepage/components/operator-signin';
 import { WorkerSignIn } from '@/pages/homepage/components/worker-signin';
+import { useColorMode } from '@/hooks/use-color-mode';
 import { useHomePageState } from '@/contexts/homepage-state';
+import { useBackgroundColorStore } from '@/hooks/use-background-store';
+
+function LightModeIcons() {
+  return (
+    <Stack
+      direction="row"
+      maxHeight="80px"
+      mb="1.5rem"
+      sx={{ transform: 'translateX(-4.5%)' }}
+    >
+      <Grid sx={{ mx: '-8px' }}>
+        <HomepageWorkIcon />
+      </Grid>
+      <Grid sx={{ mx: '-8px' }}>
+        <HomepageUserIcon />
+      </Grid>
+      <Grid sx={{ mx: '-8px' }}>
+        <HomepageLogoIcon />
+      </Grid>
+    </Stack>
+  );
+}
+
+function DarkModeIcons() {
+  return (
+    <Stack
+      sx={{
+        width: '288px',
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+      }}
+    >
+      <HomepageWorkIcon />
+      <HomepageUserIcon />
+      <HomepageLogoIcon />
+    </Stack>
+  );
+}
 
 export function Welcome() {
+  const { colorPalette, isDarkMode } = useColorMode();
+  const { setWhiteBackground } = useBackgroundColorStore();
   const { setPageView } = useHomePageState();
   const { t } = useTranslation();
   const logoText: string = t('homepage.humanApp');
   const logoTextSplit: string[] = logoText.split(' ');
   const isMobile = useIsMobile('lg');
+
+  useEffect(() => {
+    if (!isDarkMode) {
+      setWhiteBackground();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Grid
@@ -40,22 +89,7 @@ export function Welcome() {
               <MobileHomeIcons />
             </Stack>
           ) : (
-            <Stack
-              direction="row"
-              maxHeight="80px"
-              mb="1.5rem"
-              sx={{ transform: 'translateX(-4.5%)' }}
-            >
-              <Grid sx={{ mx: '-8px' }}>
-                <HomepageWorkIcon />
-              </Grid>
-              <Grid sx={{ mx: '-8px' }}>
-                <HomepageUserIcon />
-              </Grid>
-              <Grid sx={{ mx: '-8px' }}>
-                <HomepageLogoIcon />
-              </Grid>
-            </Stack>
+            <>{isDarkMode ? <DarkModeIcons /> : <LightModeIcons />}</>
           )}
           <Stack
             direction="row"
@@ -105,8 +139,11 @@ export function Welcome() {
             }}
             size="large"
             sx={{
-              backgroundColor: colorPalette.primary.light,
+              backgroundColor: isDarkMode
+                ? '#5D0CE9'
+                : colorPalette.primary.light,
               mb: '1.5625rem',
+              color: isDarkMode ? '#CDC7FF' : undefined,
             }}
             variant="contained"
           >

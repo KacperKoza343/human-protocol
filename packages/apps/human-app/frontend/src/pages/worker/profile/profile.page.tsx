@@ -1,7 +1,6 @@
 import { Grid, Paper } from '@mui/material';
 import { useEffect } from 'react';
 import { t } from 'i18next';
-import { colorPalette } from '@/styles/color-palette';
 import { ProfileData } from '@/pages/worker/profile/profile-data';
 import { ProfileActions } from '@/pages/worker/profile/profile-actions';
 import { useProtectedLayoutNotification } from '@/hooks/use-protected-layout-notifications';
@@ -30,14 +29,16 @@ export function WorkerProfilePage() {
 
   useEffect(() => {
     setNotifications();
-    setGrayBackground();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- call this once
   }, [isConnected]);
+
+  useEffect(() => {
+    setGrayBackground();
+  }, [setGrayBackground]);
 
   return (
     <Paper
       sx={{
-        backgroundColor: colorPalette.white,
         height: '100%',
         boxShadow: 'none',
         padding: isMobile ? '60px 20px' : '100px 40px',

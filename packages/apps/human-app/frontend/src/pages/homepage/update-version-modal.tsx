@@ -1,7 +1,7 @@
 import { Grid, Typography } from '@mui/material';
 import { useModalStore } from '@/components/ui/modal/modal.store';
 import { Button } from '@/components/ui/button';
-import { breakpoints } from '@/styles/theme';
+import { breakpoints } from '@/styles/breakpoints';
 
 export function UpdateVersionModal() {
   const { closeModal } = useModalStore();

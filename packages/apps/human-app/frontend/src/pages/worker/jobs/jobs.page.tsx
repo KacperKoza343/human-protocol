@@ -4,7 +4,6 @@ import { Box, Grid, Paper, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { TableQueryContextProvider } from '@/components/ui/table/table-query-context';
-import { colorPalette } from '@/styles/color-palette';
 import { useBackgroundColorStore } from '@/hooks/use-background-store';
 import { Modal } from '@/components/ui/modal/modal';
 import { useIsMobile } from '@/hooks/use-is-mobile';
@@ -15,6 +14,7 @@ import { AvailableJobsDrawerMobile } from '@/pages/worker/jobs/components/availa
 import { useGetOracles } from '@/api/services/worker/oracles';
 import { PageCardError, PageCardLoader } from '@/components/ui/page-card';
 import { defaultErrorMessage } from '@/shared/helpers/default-error-message';
+import { useColorMode } from '@/hooks/use-color-mode';
 import { AvailableJobsTableMobile } from './components/available-jobs/mobile/available-jobs-table-mobile';
 import { TabPanel } from './components/jobs-tab-panel';
 import { MyJobsTable } from './components/my-jobs/desktop/my-jobs-table';
@@ -27,6 +27,7 @@ function generateTabA11yProps(index: number) {
 }
 
 export function JobsPage() {
+  const { isDarkMode } = useColorMode();
   const { data, isError, isPending, error } = useGetOracles();
   const { address: oracle_address } = useParams<{ address: string }>();
   const { setGrayBackground } = useBackgroundColorStore();
@@ -88,9 +89,6 @@ export function JobsPage() {
               display: 'flex',
               flexDirection: 'column',
               gap: '24px',
-              backgroundColor: isMobile
-                ? colorPalette.paper.main
-                : colorPalette.white,
               height: '100%',
               boxShadow: 'none',
               padding: isMobile ? '20px' : '64px 144px',
@@ -102,7 +100,7 @@ export function JobsPage() {
               <Box
                 sx={{
                   padding: '8px 42px',
-                  backgroundColor: '#1406B20A',
+                  backgroundColor: isDarkMode ? '#CDC7FF14' : '#1406B20A',
                   display: 'inline-block',
                 }}
               >
@@ -115,7 +113,7 @@ export function JobsPage() {
                   <Box
                     sx={{
                       borderBottom: 1,
-                      borderColor: 'divider',
+                      borderColor: isDarkMode ? '#CBCFE8CC' : 'divider',
                     }}
                   >
                     <Tabs
