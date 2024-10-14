@@ -5,12 +5,17 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { t } from 'i18next';
 import { Button } from '@/components/ui/button';
-import { breakpoints } from '@/styles/theme';
+import { breakpoints } from '@/styles/breakpoints';
 import { routerPaths } from '@/router/router-paths';
-import { colorPalette } from '@/styles/color-palette';
+import { colorPalette as constColorPalette } from '@/styles/color-palette';
 import { useBackgroundColorStore } from '@/hooks/use-background-store';
 import { Loader } from '@/components/ui/loader';
 import { Alert } from '@/components/ui/alert';
+import {
+  darkColorPalette as constDarkColorPalette,
+  onlyDarkModeColor,
+} from '@/styles/dark-color-palette';
+import { useColorMode } from '@/hooks/use-color-mode';
 import { useIsMobile } from '@/hooks/use-is-mobile';
 
 const IconWrapper = styled('div')(() => ({
@@ -20,7 +25,6 @@ const IconWrapper = styled('div')(() => ({
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: '50%',
-  backgroundColor: colorPalette.paper.main,
   cursor: 'pointer',
   ':hover': {
     cursor: 'pointer',
@@ -29,7 +33,6 @@ const IconWrapper = styled('div')(() => ({
 }));
 
 const commonStyles: SxProps<Theme> = {
-  padding: '2rem',
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
@@ -37,7 +40,21 @@ const commonStyles: SxProps<Theme> = {
   minHeight: '70vh',
   maxWidth: '1600px',
   width: '100%',
-  background: colorPalette.white,
+  background: constColorPalette.white,
+};
+
+const commonStylesDark: SxProps<Theme> = {
+  flexDirection: 'column',
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderRadius: '20px',
+  minHeight: '70vh',
+  maxWidth: '1600px',
+  width: '100%',
+  background: constDarkColorPalette.paper.main,
+  [breakpoints.mobile]: {
+    background: constDarkColorPalette.backgroundColor,
+  },
 };
 
 type ButtonsProps = string | -1 | (() => void);
@@ -68,6 +85,7 @@ export function PageCard({
   hiddenCancelButton = false,
   hiddenArrowButton = false,
 }: FormCardProps) {
+  const { isDarkMode, colorPalette } = useColorMode();
   const { setGrayBackground } = useBackgroundColorStore();
   const navigate = useNavigate();
   const isMobile = useIsMobile('md');
@@ -80,7 +98,7 @@ export function PageCard({
   };
 
   useEffect(() => {
-    if (withLayoutBackground) {
+    if (withLayoutBackground && !isDarkMode) {
       setGrayBackground();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- call this effect once
@@ -102,7 +120,7 @@ export function PageCard({
     <Grid
       container
       sx={{
-        ...commonStyles,
+        ...(isDarkMode ? commonStylesDark : commonStyles),
         padding: isMobile ? '0 1rem 7.25rem 1rem' : '2rem 2rem 7.7rem 2rem',
       }}
     >
@@ -174,6 +192,9 @@ export function PageCard({
                   width: '25px',
                   height: '25px',
                   fontSize: '18px',
+                  backgroundColor: isDarkMode
+                    ? onlyDarkModeColor.backArrowBg
+                    : colorPalette.paper.main,
                 }}
               >
                 <ArrowBackIcon fontSize="inherit" />
@@ -227,7 +248,14 @@ export function PageCard({
             xs={12}
           >
             {backArrowPath && !hiddenArrowButton ? (
-              <IconWrapper onClick={goBack.bind(null, backArrowPath)}>
+              <IconWrapper
+                onClick={goBack.bind(null, backArrowPath)}
+                sx={{
+                  backgroundColor: isDarkMode
+                    ? onlyDarkModeColor.backArrowBg
+                    : colorPalette.paper.main,
+                }}
+              >
                 <ArrowBackIcon fontSize="inherit" />
               </IconWrapper>
             ) : null}
@@ -260,6 +288,7 @@ export function PageCardLoader({
   cardMaxWidth?: string;
   withLayoutBackground?: boolean;
 }) {
+  const { isDarkMode } = useColorMode();
   const { setGrayBackground } = useBackgroundColorStore();
 
   useEffect(() => {
@@ -268,9 +297,15 @@ export function PageCardLoader({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- call this effect once
   }, []);
+
+  const commonStyleForTheme = isDarkMode ? commonStylesDark : commonStyles;
+
   const sx = cardMaxWidth
-    ? { ...commonStyles, maxWidth: cardMaxWidth }
-    : commonStyles;
+    ? {
+        ...commonStyleForTheme,
+        maxWidth: cardMaxWidth,
+      }
+    : commonStyleForTheme;
 
   return (
     <Grid container sx={sx}>
@@ -296,12 +331,14 @@ export function PageCardError({
       cardMaxWidth?: string;
       withLayoutBackground?: boolean;
     }) {
+  const { isDarkMode } = useColorMode();
   const navigate = useNavigate();
   const { setGrayBackground } = useBackgroundColorStore();
+  const commonStyleForTheme = isDarkMode ? commonStylesDark : commonStyles;
 
   const sx = cardMaxWidth
-    ? { ...commonStyles, maxWidth: cardMaxWidth }
-    : commonStyles;
+    ? { ...commonStyleForTheme, maxWidth: cardMaxWidth }
+    : commonStyleForTheme;
 
   useEffect(() => {
     if (withLayoutBackground) {

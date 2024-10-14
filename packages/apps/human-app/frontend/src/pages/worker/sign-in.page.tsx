@@ -93,7 +93,11 @@ export function SignInWorkerPage() {
             <Box width="100%">
               <Typography variant="body1">
                 <Link
-                  style={{ textDecoration: 'none', fontWeight: 600 }}
+                  style={{
+                    textDecoration: 'none',
+                    fontWeight: 600,
+                    color: 'inherit',
+                  }}
                   to={routerPaths.worker.sendResetLink}
                 >
                   {t('worker.signInForm.forgotPassword')}

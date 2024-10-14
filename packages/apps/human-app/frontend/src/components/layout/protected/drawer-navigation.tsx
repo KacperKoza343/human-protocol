@@ -14,6 +14,8 @@ import { Button } from '@/components/ui/button';
 import { useIsMobile } from '@/hooks/use-is-mobile';
 import { NAVBAR_PADDING } from '@/components/layout/protected/navbar';
 import { colorPalette } from '@/styles/color-palette';
+import { useColorMode } from '@/hooks/use-color-mode';
+import { onlyDarkModeColor } from '@/styles/dark-color-palette';
 
 const drawerWidth = 240;
 
@@ -27,7 +29,7 @@ export interface DrawerItem {
 }
 
 export type TopMenuItem = DrawerItem | JSX.Element;
-export type BottomMenuItem = DrawerItem;
+export type BottomMenuItem = DrawerItem | JSX.Element;
 interface DrawerNavigationProps {
   open: boolean;
   setDrawerOpen: Dispatch<SetStateAction<boolean>>;
@@ -43,6 +45,7 @@ export function DrawerNavigation({
   bottomMenuItems,
   signOut,
 }: DrawerNavigationProps) {
+  const { isDarkMode } = useColorMode();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const location = useLocation();
@@ -130,7 +133,9 @@ export function DrawerNavigation({
                     sx={{
                       px: 0,
                       '&.Mui-selected': {
-                        backgroundColor: colorPalette.primary.shades,
+                        backgroundColor: isDarkMode
+                          ? onlyDarkModeColor.listItemColor
+                          : colorPalette.primary.shades,
                       },
                     }}
                   >
@@ -162,7 +167,24 @@ export function DrawerNavigation({
             })}
           </List>
           <List>
-            {bottomMenuItems?.map(({ label, link, icon, href, onClick }) => {
+            {bottomMenuItems?.map((item) => {
+              if (!('label' in item)) {
+                return (
+                  <ListItem key={crypto.randomUUID()}>
+                    <Stack
+                      direction="row"
+                      sx={{
+                        width: '100%',
+                        mx: isMobile ? '28px' : NAVBAR_PADDING,
+                      }}
+                    >
+                      {item}
+                    </Stack>
+                  </ListItem>
+                );
+              }
+
+              const { label, link, icon, href, onClick } = item;
               const isActive = location.pathname === link;
 
               return (
@@ -191,7 +213,9 @@ export function DrawerNavigation({
                     sx={{
                       px: 0,
                       '&.Mui-selected': {
-                        backgroundColor: colorPalette.primary.shades,
+                        backgroundColor: isDarkMode
+                          ? onlyDarkModeColor.listItemColor
+                          : colorPalette.primary.shades,
                       },
                     }}
                   >
