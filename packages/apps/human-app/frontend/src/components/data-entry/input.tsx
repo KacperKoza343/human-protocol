@@ -13,6 +13,7 @@ export interface InputProps
   autoComplete?: string;
   customError?: React.ReactNode;
   mask?: InputMask;
+  floatingLabel?: boolean;
 }
 
 export function Input({
@@ -21,6 +22,7 @@ export function Input({
   label,
   customError,
   mask,
+  floatingLabel = false,
   ...rest
 }: InputProps) {
   const { colorPalette } = useColorMode();
@@ -33,7 +35,7 @@ export function Input({
           {...field}
           FormHelperTextProps={{ component: 'div' }}
           InputLabelProps={{
-            shrink: false,
+            shrink: floatingLabel ? undefined : true,
           }}
           InputProps={
             mask
@@ -55,7 +57,7 @@ export function Input({
               {customError ? customError : fieldState.error?.message}
             </Typography>
           }
-          label={label}
+          label={floatingLabel ? label : undefined}
           name={name}
           variant="outlined"
           {...rest}

@@ -17,6 +17,7 @@ const OPTIONS = [Role.ExchangeOracle, Role.JobLauncher, Role.RecordingOracle];
 const formInputsConfig: Record<EthKVStoreKeyValues, React.ReactElement> = {
   [EthKVStoreKeys.Fee]: (
     <Input
+      floatingLabel
       fullWidth
       label={t('operator.addKeysPage.existingKeys.fee')}
       mask="PercentsInputMask"
@@ -25,6 +26,7 @@ const formInputsConfig: Record<EthKVStoreKeyValues, React.ReactElement> = {
   ),
   [EthKVStoreKeys.PublicKey]: (
     <Input
+      floatingLabel
       fullWidth
       label={t('operator.addKeysPage.existingKeys.publicKey')}
       name={EthKVStoreKeys.PublicKey}
@@ -32,6 +34,7 @@ const formInputsConfig: Record<EthKVStoreKeyValues, React.ReactElement> = {
   ),
   [EthKVStoreKeys.Url]: (
     <Input
+      floatingLabel
       fullWidth
       label={t('operator.addKeysPage.existingKeys.url')}
       name={EthKVStoreKeys.Url}
@@ -39,6 +42,7 @@ const formInputsConfig: Record<EthKVStoreKeyValues, React.ReactElement> = {
   ),
   [EthKVStoreKeys.WebhookUrl]: (
     <Input
+      floatingLabel
       fullWidth
       label={t('operator.addKeysPage.existingKeys.webhookUrl')}
       name={EthKVStoreKeys.WebhookUrl}
