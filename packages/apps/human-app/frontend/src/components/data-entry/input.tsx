@@ -32,6 +32,9 @@ export function Input({
         <TextField
           {...field}
           FormHelperTextProps={{ component: 'div' }}
+          InputLabelProps={{
+            shrink: false,
+          }}
           InputProps={
             mask
               ? {
