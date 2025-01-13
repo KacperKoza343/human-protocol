@@ -24,7 +24,7 @@ import { EscrowAddressSearchForm } from '@/modules/worker/components/jobs/escrow
 import { colorPalette as lightModeColorPalette } from '@/shared/styles/color-palette';
 import { useRefreshTasksMutation } from '@/modules/worker/services/refresh-tasks';
 import { getChipStatusColor } from '@/modules/worker/utils/get-chip-status-color';
-import { MyJobsTableActions } from '../../my-jobs-table-actions';
+import { MyJobsTableActions } from '@/modules/worker/components/jobs/my-jobs-table-actions';
 
 interface MyJobsTableMobileProps {
   setIsMobileFilterDrawerOpen: Dispatch<SetStateAction<boolean>>;
@@ -56,11 +56,10 @@ export function MyJobsTableMobile({
   useEffect(() => {
     if (!tableData) return;
     const pagesFromRes = tableData.pages.flatMap((pages) => pages.results);
-    if (filterParams.page === 0) {
-      setAllPages(pagesFromRes);
-    } else {
-      setAllPages((state) => [...state, ...pagesFromRes]);
-    }
+
+    setAllPages((state) =>
+      filterParams.page === 0 ? pagesFromRes : [...state, ...pagesFromRes]
+    );
   }, [tableData, filterParams.page]);
 
   useEffect(() => {

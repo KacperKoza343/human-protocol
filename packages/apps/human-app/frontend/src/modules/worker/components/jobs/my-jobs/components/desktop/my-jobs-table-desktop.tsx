@@ -32,7 +32,7 @@ import type { JobType } from '@/modules/smart-contracts/EthKVStore/config';
 import { EscrowAddressSearchForm } from '@/modules/worker/components/jobs/escrow-address-search-form';
 import { useRefreshTasksMutation } from '@/modules/worker/services/refresh-tasks';
 import { StatusChip } from '@/modules/worker/components/jobs/status-chip';
-import { MyJobsTableActions } from '../../my-jobs-table-actions';
+import { MyJobsTableActions } from '../../../my-jobs-table-actions';
 
 interface MyJobsTableProps {
   chainIdsEnabled: number[];
@@ -213,7 +213,7 @@ const getColumnsDefinition = ({
   },
 ];
 
-export function MyJobsTable({ chainIdsEnabled }: MyJobsTableProps) {
+export function MyJobsTableDesktop({ chainIdsEnabled }: MyJobsTableProps) {
   const { colorPalette, isDarkMode } = useColorMode();
   const {
     setSearchEscrowAddress,
